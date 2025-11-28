@@ -6,7 +6,7 @@ function BoxList() {
   const [cantidadDeCajas, setCantidadDeCajas] = useState(5);
 
   // Estado para controlar si se muestra el título de cada caja
-  const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>(Array(5).fill(true));
+  const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>(Array(4).fill(true));
 
   // Aumentar cajas
   const aumentarCajas = () => {
@@ -34,7 +34,7 @@ function BoxList() {
   return (
     <div className="  rounded-2xl  bg-gray-50 ">
       {/* GRID DE CAJAS */}
-      <div className="grid grid-cols-2 gap-1">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-1">
         {Array.from({ length: cantidadDeCajas }).map((_, index) => (
           <BoxCard
             key={index}

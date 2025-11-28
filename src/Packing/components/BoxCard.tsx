@@ -1,17 +1,16 @@
 // BoxCard.tsx
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import Box from '@mui/material/Box';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
+import BoxContend from './BoxContend';
 
 interface BoxCardProps {
   titulo: string;
-  onEliminar?: () => void;
+  onEliminar?: () => void; 
   mostrarTitulo?: boolean;
   alternarTitulo?: () => void;
 }
@@ -20,7 +19,7 @@ function BoxCard({ titulo, onEliminar, mostrarTitulo = true, alternarTitulo }: B
   return (
     <Card
       sx={{
-        width: '090%',
+        width: '90%',
         borderRadius: 3,
         border: '1px solid #e5e7eb',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
@@ -55,16 +54,7 @@ function BoxCard({ titulo, onEliminar, mostrarTitulo = true, alternarTitulo }: B
         }}
       />
 
-      <CardContent
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          paddingBottom: 3,
-        }}
-      >
-        <Inventory2OutlinedIcon sx={{ fontSize: 60, color: '#f97316' }} />
-      </CardContent>
+        <BoxContend/>
     </Card>
   );
 }
