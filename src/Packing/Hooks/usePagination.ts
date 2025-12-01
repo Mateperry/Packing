@@ -10,6 +10,7 @@ export function usePagination<T>(items: T[], itemsPerPage: number = 4) {
     return items.slice(start, start + itemsPerPage);
   }, [items, page, itemsPerPage]);
 
+  // Funciones de navegación
   function nextPage() {
     setPage((p) => Math.min(p + 1, totalPages));
   }
@@ -26,10 +27,12 @@ export function usePagination<T>(items: T[], itemsPerPage: number = 4) {
     setPage(1);
   }
 
-   
+  // Ajustar la página si la actual ya no existe
   useEffect(() => {
-    setPage(1);
-  }, [items]);
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [totalPages, page]);
 
   return {
     page,
@@ -41,6 +44,3 @@ export function usePagination<T>(items: T[], itemsPerPage: number = 4) {
     resetPage,
   };
 }
-
-
-

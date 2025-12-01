@@ -7,14 +7,21 @@ import PaginationButtons from "./PaginationButtons";
 
 interface ProductListProps {
   products: Product[];
+  usedProductIds?: number[]; // IDs de productos que ya están en cajas
 }
 
-function ProductList({ products }: ProductListProps) {
+function ProductList({ products, usedProductIds = [] }: ProductListProps) {
+  // Filtramos productos que ya están en cajas o que su cantidad es 0
+  const availableProducts = products.filter(
+    (p) => p.quantity > 0 && !usedProductIds.includes(p.id)
+  );
+
   // Hook de búsqueda
-  const { search, onChange, filtered } = useSearchProducts(products);
+  const { search, onChange, filtered } = useSearchProducts(availableProducts);
 
   // Hook de paginación SOLO sobre los filtrados
-  const { page, totalPages, currentItems, nextPage, prevPage, resetPage } = usePagination(filtered, 4);
+  const { page, totalPages, currentItems, nextPage, prevPage, resetPage } =
+    usePagination(filtered, 4);
 
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     onChange(e);
@@ -22,7 +29,7 @@ function ProductList({ products }: ProductListProps) {
   }
 
   return (
-    <div className="w-full md:w-1/4 bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-20% overflow-y-hidden ">
+    <div className="w-full md:w-1/4 bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-[80vh] ">
       <SearchBar value={search} onChange={handleSearch} />
 
       {/* Cantidad de items */}

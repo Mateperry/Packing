@@ -11,6 +11,7 @@ return (
           justifyContent: 'center',
           alignItems: 'center',
           paddingBottom: 3,
+          overflow: 'auto',
         }}
       >
         <ArchiveIcon sx={{ fontSize: 60, color: '#f97316' }} />

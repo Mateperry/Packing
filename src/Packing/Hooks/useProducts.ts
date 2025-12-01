@@ -13,14 +13,23 @@ export function useProducts() {
     { id: 8, name: "AXN03C", description: "PRODUCTO H", quantity: 2 },
   ]);
 
-  //  Reducir cantidad
-  const decreaseQuantity = (id: number) => {
+  // Reducir cantidad (cuando agregas a caja)
+  const decreaseQuantity = (id: number, amount = 1) => {
     setProducts(prev =>
-      prev
-        .map(p => p.id === id ? { ...p, quantity: p.quantity - 1 } : p)
-        .filter(p => p.quantity > 0) // si llega a 0 → desaparece
+      prev.map(p =>
+        p.id === id ? { ...p, quantity: Math.max(p.quantity - amount, 0) } : p
+      )
     );
   };
 
-  return { products, decreaseQuantity };
+  // Aumentar cantidad (cuando eliminas de caja)
+  const increaseQuantity = (id: number, amount = 1) => {
+    setProducts(prev =>
+      prev.map(p =>
+        p.id === id ? { ...p, quantity: p.quantity + amount } : p
+      )
+    );
+  };
+
+  return { products, decreaseQuantity, increaseQuantity };
 }

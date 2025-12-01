@@ -6,9 +6,10 @@ function App() {
 
 
   return (
-<>
-<Packing />
-</>
+<div className="overflow-hidden">
+  <Packing />
+</div>
+
 
 
   )

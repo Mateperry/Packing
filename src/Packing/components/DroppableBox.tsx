@@ -1,10 +1,9 @@
 // DroppableBox.tsx
 import { useDroppable } from "@dnd-kit/core";
-import BoxContend from "./BoxContend";
 
 interface Props {
   boxId: number;
-  children?: React.ReactNode; // para mostrar productos dentro
+  children?: React.ReactNode;
 }
 
 export default function DroppableBox({ boxId, children }: Props) {
@@ -17,11 +16,13 @@ export default function DroppableBox({ boxId, children }: Props) {
     <div
       ref={setNodeRef}
       style={{
-        border: isOver ? "2px dashed #f97316" : "2px solid transparent",
+        border: isOver ? "2px dashed #31C950" : "2px solid transparent",
         borderRadius: "12px",
+        minHeight: 140,
+        padding: 12,
+        overflowY: "auto",
       }}
     >
-      <BoxContend />
       {children}
     </div>
   );

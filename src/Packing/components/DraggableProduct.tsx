@@ -4,13 +4,15 @@ import type { Product } from "../interfaces/Product";
 
 interface Props {
   product: Product;
+  disabled?: boolean; // ✅ Nueva prop para deshabilitar
 }
 
-export default function DraggableProduct({ product }: Props) {
+export default function DraggableProduct({ product, disabled = false }: Props) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `product-${product.id}`,
       data: { type: "PRODUCT", product },
+      disabled, // ✅ Deshabilita drag si es true
     });
 
   const style = transform
@@ -24,8 +26,8 @@ export default function DraggableProduct({ product }: Props) {
       {...attributes}
       style={{
         ...style,
-        opacity: isDragging ? 0.4 : 1,
-        cursor: "grab",
+        opacity: disabled ? 0.4 : isDragging ? 0.4 : 1, // ✨ Más visible si está deshabilitado
+        cursor: disabled ? "not-allowed" : "grab",
       }}
     >
       <ProductItem product={product} />
