@@ -26,26 +26,32 @@ function PackingPage() {
     handleUpdateQuantity, // Función para manejar la actualización de la cantidad de un producto
     
   } = usePackingService(); // Aquí usamos el asistente para obtener los datos y funciones necesarias
+// /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// RENDERIZADO DEL COMPONENTE PRINCIPAL DE LA PAGINA DE PACKING
 
   return (
-    <div className="p-3 bg-white rounded-xl shadow-lg max-w-full mx-auto mb-5">
-      <DndContext onDragEnd={handleDragEnd}>
-        <div className="flex flex-col items-center mb-6 gap-6">
-          <h2 className="bg-green-600 text-white text-center py-3 px-6 rounded-full text-lg font-sans w-full">
-            DISTRIBUCIÓN DE PRODUCTOS
-          </h2>
-          <HomeButtons />
+// Contenedor principal de la pagina de packing
+
+    <div className="p-3 bg-white rounded-xl shadow-lg max-w-full mx-auto mb-5"> {/* Aquí aplicamos estilos de padding, fondo blanco, bordes redondeados, sombra, ancho máximo completo, centrado horizontal y margen inferior */}
+      <DndContext onDragEnd={handleDragEnd}> {/* Aquí envolvemos el contenido en el contexto de arrastrar y soltar, con la función para manejar el evento de finalización del arrastre */}
+        <div className="flex flex-col items-center mb-6 gap-6"> {/* Contenedor para el título y los botones, con estilos de flexbox, margen inferior y espacio entre elementos */}
+          <h2 className="bg-green-600 text-white text-center py-3 px-6 rounded-full text-lg font-sans w-full"> {/* Título principal con estilos de fondo verde, texto blanco, centrado, padding, bordes redondeados, tamaño de texto grande, fuente sans-serif y ancho completo */}
+            DISTRIBUCIÓN DE PRODUCTOS 
+          </h2> 
+          <HomeButtons /> {/* Aquí renderizamos el componente de los botones principales */}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4">
-          <ProductList products={products}  />
+        <div className="flex flex-col md:flex-row gap-4"> {/* Contenedor principal para la lista de productos y la lista de cajas, con estilos de flexbox, dirección de columna en pantallas pequeñas y fila en pantallas medianas y grandes, y espacio entre elementos */} 
+          <ProductList products={products}  /> {/* Aquí renderizamos la lista de productos disponibles para empacar */}
 
 
-          <div className="flex-1 bg-gray-50 rounded-xl p-4 shadow-inner">
-            <BoxList
-              boxes={boxes}
-              mostrarTitulos={mostrarTitulos}
-              alternarTitulo={alternarTitulo}
+          <div className="flex-1 bg-gray-50 rounded-xl p-4 shadow-inner">   {/* Contenedor para la lista de cajas, con estilos de flexibilidad, fondo gris claro, bordes redondeados, padding y sombra interna */}
+            {/* Aquí renderizamos la lista de cajas con los productos empacados, pasando las props necesarias */}
+            <BoxList 
+              boxes={boxes} // Lista de cajas con productos empacados
+              mostrarTitulos={mostrarTitulos} // Estado que indica si se deben mostrar los títulos de las cajas
+              alternarTitulo={alternarTitulo} // 
               eliminarCaja={eliminarCaja}
               agregarCaja={aumentarCajas}
               updateProductQuantity={handleUpdateQuantity}
