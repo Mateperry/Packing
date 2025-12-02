@@ -29,11 +29,12 @@ function ProductList({ products, usedProductIds = [] }: ProductListProps) {
   }
 
   return (
-    <div className="w-full md:w-1/4 bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-[80vh] ">
+    <div className=" w-full sm:w-2/3 md:w-1/2  lg:w-1/3 xl:w-1/5  bg-gray-50  rounded-xl  p-4  flex  flex-col  gap-3  shadow-inner max-h-full ">
+
       <SearchBar value={search} onChange={handleSearch} />
 
       {/* Cantidad de items */}
-      <div className="bg-gray-200 rounded-xl px-4 py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto">
+      <div className="bg-gray-200 rounded-xl px-4 py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto ">
         <span className="text-xs sm:text-sm">Cantidad de ítems:</span>
         <span className="text-lg sm:text-xl font-semibold">
           {filtered.reduce((sum, item) => sum + item.quantity, 0)}
@@ -41,7 +42,7 @@ function ProductList({ products, usedProductIds = [] }: ProductListProps) {
       </div>
 
       {/* Lista filtrada + paginada */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2  max-h-[50hvh]">
         {currentItems.map((p) => (
           <DraggableProduct key={p.id} product={p} />
         ))}

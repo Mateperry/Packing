@@ -19,6 +19,7 @@ export default function DroppableBox({ boxId, children }: Props) {
         border: isOver ? "2px dashed #31C950" : "2px solid transparent",
         borderRadius: "12px",
         minHeight: 140,
+        maxHeight: 200,
         padding: 12,
         overflowY: "auto",
       }}

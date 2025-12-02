@@ -1,3 +1,41 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+/* Minimalista */
+.my-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.my-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.my-scroll::-webkit-scrollbar-thumb {
+  background: #cfcfcf;
+  border-radius: 20px;
+}
+
+.my-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b5b5b5;
+}
+/* Scrollbar general */
+::-webkit-scrollbar {
+  width: 4px;           /* Grosor del scrollbar */
+}
+
+/* Fondo del scrollbar */
+::-webkit-scrollbar-track {
+  background: #e5e7eb;  /* gris claro (tailwind: gray-200) */
+  border-radius: 100px;
+}
+
+/* Barra que se mueve */
+::-webkit-scrollbar-thumb {
+  background: #31C950;  /* tu verde */
+  border-radius: 100px;
+}
+
+/* Hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #26a846;  /* verde un poco más oscuro */
+}

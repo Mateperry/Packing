@@ -1,4 +1,3 @@
-// Hooks/usePackingService.ts
 import { useProducts } from "./useProducts";
 import { usePackingManager } from "./usePackingManager";
 
@@ -14,6 +13,11 @@ export function usePackingService() {
     updateProductQuantity,
     removeProduct,
   } = usePackingManager();
+
+  // 🔥 IDs de productos que ya están en cajas
+  const usedProductIds = boxes
+    .flatMap((box) => box.productos)
+    .map((p) => p.id);
 
   // Cuando se arrastra un producto a la caja
   const handleDragEnd = (event: any) => {
@@ -32,23 +36,29 @@ export function usePackingService() {
     }
   };
 
-  // Eliminar producto de la caja
+  // Eliminar producto con la X (toda la cantidad)
   const handleRemoveProduct = (boxId: number, productId: number) => {
     const box = boxes[boxId];
     const prodInBox = box.productos.find((p) => p.id === productId);
     if (!prodInBox) return;
 
-    increaseQuantity(productId, prodInBox.quantity);
-    removeProduct(boxId, productId);
+    increaseQuantity(productId, prodInBox.quantity); // Devuelve todo al inventario
+    removeProduct(boxId, productId); // Elimina de la caja
   };
 
-  // Actualizar cantidad dentro de la caja
-  const handleUpdateQuantity = (boxId: number, productId: number, delta: number) => {
+  // Actualizar cantidad con – o +
+  const handleUpdateQuantity = (
+    boxId: number,
+    productId: number,
+    delta: number
+  ) => {
     updateProductQuantity(boxId, productId, delta);
 
     if (delta < 0) {
       const box = boxes[boxId];
       const prodInBox = box.productos.find((p) => p.id === productId);
+
+      // Si ya no queda producto en la caja, devolver 1 al inventario
       if (!prodInBox) {
         increaseQuantity(productId, 1);
       }
@@ -60,6 +70,7 @@ export function usePackingService() {
   return {
     products,
     boxes,
+    usedProductIds, // 🔥 para ProductList
     mostrarTitulos,
     alternarTitulo,
     eliminarCaja,

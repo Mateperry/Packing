@@ -21,22 +21,23 @@ export default function BoxList({
   removeProduct,
 }: Props) {
   return (
-    <div className="rounded-2xl bg-gray-50 p-2">
+    <div className="rounded-2xl bg-gray-50 ">
       {/* GRID DE CAJAS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-3 overflow-auto max-h-[80vh]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 overflow-auto max-h-[100vh] my-scroll pr-2">
         {boxes.map((box, index) => (
-          <BoxCard
-            key={box.id}
-            titulo={`Caja ${box.id + 1}`}
-            mostrarTitulo={mostrarTitulos[index]}
-            alternarTitulo={() => alternarTitulo(index)}
-            onEliminar={() => eliminarCaja(index)}
-            boxId={box.id}
-            productos={box.productos}
-            updateProductQuantity={updateProductQuantity}
-            removeProduct={removeProduct}
-          />
-        ))}
+  <BoxCard
+    key={index}
+    titulo={`Caja ${index + 1}`}
+    mostrarTitulo={mostrarTitulos[index]}
+    alternarTitulo={() => alternarTitulo(index)}
+    onEliminar={() => eliminarCaja(index)}
+    boxId={index} // 🔥 ESTE ES EL IMPORTANTE
+    productos={box.productos}
+    updateProductQuantity={updateProductQuantity}
+    removeProduct={removeProduct}
+  />
+))}
+
       </div>
 
       {/* BOTÓN PARA AGREGAR CAJA */}
