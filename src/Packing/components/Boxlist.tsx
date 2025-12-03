@@ -7,7 +7,7 @@ interface Props {
   alternarTitulo: (index: number) => void;
   eliminarCaja: (index: number) => void;
   agregarCaja: () => void;
-  updateProductQuantity: (boxId: number, productId: number, delta: number) => void;
+  handleDecreaseProduct: (boxId: number, productId: number) => void;
   removeProduct: (boxId: number, productId: number) => void;
 }
 
@@ -17,13 +17,16 @@ export default function BoxList({
   alternarTitulo,
   eliminarCaja,
   agregarCaja,
-  updateProductQuantity,
+  handleDecreaseProduct,
   removeProduct,
 }: Props) {
   return (
-    <div className="rounded-2xl bg-gray-50 ">
+    <div className="rounded-sm bg-gray-50 my-scroll overflow-auto">
       {/* GRID DE CAJAS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 overflow-auto max-h-[100vh] my-scroll pr-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 
+            gap-3 overflow-auto 
+            max-h-[60vh] sm:max-h-[70vh] md:max-h-[80vh] lg:max-h-[95vh] xl:max-h-[100vh]
+             pr-2">
         {boxes.map((box, index) => (
   <BoxCard
     key={index}
@@ -31,9 +34,9 @@ export default function BoxList({
     mostrarTitulo={mostrarTitulos[index]}
     alternarTitulo={() => alternarTitulo(index)}
     onEliminar={() => eliminarCaja(index)}
-    boxId={index} // 🔥 ESTE ES EL IMPORTANTE
+    boxId={index} //  ESTE ES EL IMPORTANTE
     productos={box.productos}
-    updateProductQuantity={updateProductQuantity}
+    handleDecreaseProduct={handleDecreaseProduct}
     removeProduct={removeProduct}
   />
 ))}

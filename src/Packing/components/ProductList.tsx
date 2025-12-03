@@ -4,6 +4,7 @@ import DraggableProduct from "./DraggableProduct";
 import { useSearchProducts } from "../Hooks/useSearchProducts";
 import { usePagination } from "../Hooks/usePagination";
 import PaginationButtons from "./PaginationButtons";
+import { useResponsiveItems } from "../Hooks/useResponsiveItems"; // ⬅️ nuevo
 
 interface ProductListProps {
   products: Product[];
@@ -19,9 +20,12 @@ function ProductList({ products, usedProductIds = [] }: ProductListProps) {
   // Hook de búsqueda
   const { search, onChange, filtered } = useSearchProducts(availableProducts);
 
+  // ⬅️ NEW: items por página según dispositivo
+  const itemsPerPage = useResponsiveItems();
+
   // Hook de paginación SOLO sobre los filtrados
   const { page, totalPages, currentItems, nextPage, prevPage, resetPage } =
-    usePagination(filtered, 4);
+    usePagination(filtered, itemsPerPage);
 
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     onChange(e);
@@ -29,14 +33,14 @@ function ProductList({ products, usedProductIds = [] }: ProductListProps) {
   }
 
   return (
-    <div className=" w-full sm:w-2/3 md:w-1/2  lg:w-1/3 xl:w-1/5  bg-gray-50  rounded-xl  p-4  flex  flex-col  gap-3  shadow-inner max-h-full ">
+    <div className=" w-full sm:w-2/12 md:w-3/12  lg:w-1/4 xl:w-1/6  bg-gray-50  rounded-xl  p-4  flex  flex-col  gap-3  shadow-inner max-h-full ">
 
       <SearchBar value={search} onChange={handleSearch} />
 
       {/* Cantidad de items */}
       <div className="bg-gray-200 rounded-xl px-4 py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto ">
-        <span className="text-xs sm:text-sm">Cantidad de ítems:</span>
-        <span className="text-lg sm:text-xl font-semibold">
+        <span className="text-base sm:text-xs md:text-xs lg:text-base">Cantidad de ítems:</span>
+        <span className="text-base sm:text-sm  md:text-sm lg:text-base font-semibold">
           {filtered.reduce((sum, item) => sum + item.quantity, 0)}
         </span>
       </div>
@@ -49,7 +53,7 @@ function ProductList({ products, usedProductIds = [] }: ProductListProps) {
       </div>
 
       {/* Botones de paginación */}
-      {filtered.length > 4 && (
+      {filtered.length > itemsPerPage && (
         <PaginationButtons
           page={page}
           totalPages={totalPages}

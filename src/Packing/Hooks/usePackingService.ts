@@ -46,26 +46,23 @@ export function usePackingService() {
     removeProduct(boxId, productId); // Elimina de la caja
   };
 
-  // Actualizar cantidad con – o +
-  const handleUpdateQuantity = (
-    boxId: number,
-    productId: number,
-    delta: number
-  ) => {
-    updateProductQuantity(boxId, productId, delta);
+const handleDecreaseProduct = (boxId: number, productId: number) => {
+  const box = boxes[boxId];
+  const prodInBox = box.productos.find((p) => p.id === productId);
+  if (!prodInBox) return;
 
-    if (delta < 0) {
-      const box = boxes[boxId];
-      const prodInBox = box.productos.find((p) => p.id === productId);
+  // si era 1 → va a desaparecer
+  const willDisappear = prodInBox.quantity === 1;
 
-      // Si ya no queda producto en la caja, devolver 1 al inventario
-      if (!prodInBox) {
-        increaseQuantity(productId, 1);
-      }
-    } else if (delta > 0) {
-      decreaseQuantity(productId, delta);
-    }
-  };
+  updateProductQuantity(boxId, productId, -1);
+
+  if (willDisappear) {
+    increaseQuantity(productId, 1);
+  }
+};
+
+
+
 
   return {
     products,
@@ -77,6 +74,6 @@ export function usePackingService() {
     aumentarCajas,
     handleDragEnd,
     handleRemoveProduct,
-    handleUpdateQuantity,
+    handleDecreaseProduct,
   };
 }

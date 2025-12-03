@@ -10,7 +10,6 @@ import CategoryIcon from '@mui/icons-material/Category';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 
-
 import DroppableBox from "./DroppableBox";
 import BoxContend from "./BoxContend";
 
@@ -23,7 +22,7 @@ interface Props {
   onEliminar: () => void;
   boxId: number;
   productos: Product[];
-  updateProductQuantity: (boxId: number, productId: number, delta: number) => void;
+  handleDecreaseProduct: (boxId: number, productId: number) => void;
   removeProduct: (boxId: number, productId: number) => void;
 }
 
@@ -34,7 +33,7 @@ export default function BoxCard({
   onEliminar,
   boxId,
   productos,
-  updateProductQuantity,
+  handleDecreaseProduct,
   removeProduct,
 }: Props) {
   const hasProducts = productos.length > 0;
@@ -55,11 +54,7 @@ export default function BoxCard({
         title={mostrarTitulo ? titulo : ""}
         action={
           <Box sx={{ display: "flex", gap: 1 }}>
-            <IconButton
-              size="medium"
-              onClick={alternarTitulo}
-              title="Mostrar/ocultar título"
-            >
+            <IconButton size="medium" onClick={alternarTitulo} title="Mostrar/ocultar título">
               {mostrarTitulo ? (
                 <VisibilityOutlinedIcon sx={{ fontSize: 18 }} />
               ) : (
@@ -96,63 +91,63 @@ export default function BoxCard({
         ) : (
           <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
             {productos.map((prod) => (
-<Box
-  key={prod.id}
-  sx={{
-    padding: "8px 12px",
-    borderRadius: "10px",
-    backgroundColor: "#F9FAFB",
-    border: "1px solid #E5E7EB",
-    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+              <Box
+                key={prod.id}
+                sx={{
+                  padding: "8px 12px",
+                  borderRadius: "10px",
+                  backgroundColor: "#F9FAFB",
+                  border: "1px solid #E5E7EB",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                {/* IZQUIERDA */}
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                  <Box
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: "6px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: 10,
+                      fontWeight: 100,
+                      color: "white",
+                      backgroundColor: prod.quantity > 1 ? "#10B981" : "#F59E0B",
+                    }}
+                  >
+                    <CategoryIcon sx={{ fontSize: 16 }} />
+                  </Box>
 
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 2,
-  }}
->
-  {/* IZQUIERDA */}
-  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-    <Box
-      sx={{
-        width: 28,
-        height: 28,
-        borderRadius: "6px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 10,
-        fontWeight: 100,
-        color: "white",
-        backgroundColor: prod.quantity > 1 ? "#10B981" : "#F59E0B",
-      }}
-    >
-      <CategoryIcon sx={{ fontSize: 16 }} />
-    </Box>
+                  <span style={{ fontWeight: 400 }}>
+                    {prod.name} <strong>X{prod.quantity}</strong>
+                  </span>
+                </Box>
 
-    <span style={{ fontWeight: 400 }}>
-      {prod.name} <strong>X{prod.quantity}</strong>
-    </span>
-  </Box>
+                {/* DERECHA */}
+                <Box sx={{ display: "flex", gap: 1 }}>
+                  
+                  {/* 🔥 FIX: Aquí se arregla el error */}
+                  <button
+                    onClick={() => handleDecreaseProduct(boxId, prod.id)}
+                    className="py-1 transition text-sm"
+                  >
+                    <RemoveCircleIcon sx={{ fontSize: 22 }} />
+                  </button>
 
-  {/* DERECHA */}
-  <Box sx={{ display: "flex", gap: 1 }}>
-    <button
-      onClick={() => updateProductQuantity(boxId, prod.id, -1)}
-      className=" py-1  transition text-sm"
-    >
-      <RemoveCircleIcon sx={{ fontSize: 22 }} />
-    </button>
-
-    <button
-      onClick={() => removeProduct(boxId, prod.id)}
-      className=" py-1  text-red-500 rounded transition text-sm"
-    >
-      <CancelIcon sx={{ fontSize: 22 }} />
-    </button>
-  </Box>
-</Box>
-
+                  <button
+                    onClick={() => removeProduct(boxId, prod.id)}
+                    className="py-1 text-red-500 rounded transition text-sm"
+                  >
+                    <CancelIcon sx={{ fontSize: 22 }} />
+                  </button>
+                </Box>
+              </Box>
             ))}
           </Box>
         )}

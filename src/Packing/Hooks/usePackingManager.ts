@@ -1,23 +1,29 @@
-import { useState } from "react";
-import type { Product } from "../interfaces/Product";
+// src/Packing/Hooks/usePackingManager.ts
+// Controla toda la lógica de empacar productos en cajas, manteniendo sincronizado el inventario y lo que hay dentro de cada caja.
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Importaciones de React y tipos 
+import { useState } from "react"; // useState para manejar estados internos
+import type { Product } from "../interfaces/Product"; // Tipo Product para definir la estructura de los productos
 
-export function usePackingManager(initial = 5) {
-  const [cantidadDeCajas, setCantidadDeCajas] = useState(initial);
-  const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>(
-    Array(initial).fill(true)
+// Hook personalizado para gestionar el empaquetado de productos en cajas, manteniendo sincronizado el inventario y lo que hay dentro de cada caja
+
+export function usePackingManager(initial = 6) { // Valor inicial de cajas a mostrar 6 
+  const [cantidadDeCajas, setCantidadDeCajas] = useState(initial); // Estado para la cantidad de cajas empezamos en el valor initial (6)
+  const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>( // Estado para controlar si se muestran los títulos de las cajas 
+    Array(initial).fill(true) // Inicialmente todos los títulos están visibles 
   );
-
+/////////////////////////////////////////////////////////////////////// Control de Items "" ////////////////////////////////////////////////////////// 
   // INVENTARIO GLOBAL ORIGINAL
-  const [productos, setProductos] = useState<Product[]>([]);
+  const [productos, setProductos] = useState<Product[]>([]); // Estado para el inventario global de productos No estan dentrdo de las cajas 
 
-  // PRODUCTOS DENTRO DE LAS CAJAS
-  const [productosPorCaja, setProductosPorCaja] = useState<
-    (Product & { quantity: number })[][]
-  >(Array.from({ length: initial }, () => []));
+  // PRODUCTOS DENTRO DE LAS CAJAS 
+  const [productosPorCaja, setProductosPorCaja] = useState<  // Estado para los productos dentro de cada caja  
+    (Product & { quantity: number })[][] // Cada caja contiene un array de productos con su cantidad 
+  >(Array.from({ length: initial }, () => [])); // Inicialmente hay 'initial' cajas vacías 
 
-  // -------------------------------------------
-  //  CAJAS
-  // -------------------------------------------
+///////////////////////////////////////////////////////////////////////// Control de Aumento de cajas /////////////////////////////////////////////////////////
 
   const aumentarCajas = () => {
     const hayCajaVacia = productosPorCaja.some((caja) => caja.length === 0);
@@ -27,7 +33,7 @@ export function usePackingManager(initial = 5) {
     setMostrarTitulos((prev) => [...prev, true]);
     setProductosPorCaja((prev) => [...prev, []]);
   };
-
+///////////////////////////////////////////////////////////////////////// Control de Mostrar Titulo /////////////////////////////////////////////////////////
   const alternarTitulo = (index: number) => {
     setMostrarTitulos((prev) => {
       const copy = [...prev];
@@ -35,7 +41,7 @@ export function usePackingManager(initial = 5) {
       return copy;
     });
   };
-
+////////////////////////////////////////////////////////////////////////// Control de Eliminar Caja /////////////////////////////////////////////////////////
   const eliminarCaja = (index: number) => {
     if (cantidadDeCajas === 1) return;
 
@@ -43,11 +49,7 @@ export function usePackingManager(initial = 5) {
     setMostrarTitulos((prev) => prev.filter((_, i) => i !== index));
     setProductosPorCaja((prev) => prev.filter((_, i) => i !== index));
   };
-
-  // -------------------------------------------
-  //  AGREGAR A CAJA
-  // -------------------------------------------
-
+//////////////////////////////////////////////////////////////////////// Agregar Producto a Caja /////////////////////////////////////////////////////////
   const agregarProductoACaja = (index: number, product: Product) => {
     // 1) Descontar 1 del inventario global
     setProductos((prev) =>
@@ -76,46 +78,35 @@ export function usePackingManager(initial = 5) {
     });
   };
 
-  // -------------------------------------------
-  //  MODIFICAR CANTIDAD DENTRO DE UNA CAJA
-  // -------------------------------------------
+////////////////////////////////////////////////////////////////////////////// Actualizar Cantidad de Producto en Caja /////////////////////////////////////////////////
 
-  const updateProductQuantity = (
-    boxId: number,
-    productId: number,
-    delta: number
-  ) => {
-    setProductosPorCaja((prev) => {
-      const copy = [...prev];
-      const productos = [...copy[boxId]];
-      const index = productos.findIndex((p) => p.id === productId);
-      if (index === -1) return prev;
+const updateProductQuantity = (
+  boxId: number,
+  productId: number,
+  delta: number
+) => {
+  setProductosPorCaja((prev) => {
+    const copy = [...prev];
+    const productos = [...copy[boxId]];
+    const index = productos.findIndex((p) => p.id === productId);
+    if (index === -1) return prev;
 
-      const newQuantity = productos[index].quantity + delta;
+    const newQuantity = productos[index].quantity + delta;
 
-      // Si delta es -1, devolvemos 1 al inventario
-      if (delta < 0) {
-        setProductos((prevInv) =>
-          prevInv.map((p) =>
-            p.id === productId ? { ...p, quantity: p.quantity + 1 } : p
-          )
-        );
-      }
+    if (newQuantity <= 0) {
+      productos.splice(index, 1);
+    } else {
+      productos[index] = { ...productos[index], quantity: newQuantity };
+    }
 
-      if (newQuantity <= 0) {
-        productos.splice(index, 1);
-      } else {
-        productos[index] = { ...productos[index], quantity: newQuantity };
-      }
+    copy[boxId] = productos;
+    return copy;
+  });
+};
 
-      copy[boxId] = productos;
-      return copy;
-    });
-  };
-
-  // -------------------------------------------
-  //  ELIMINAR CON LA X
-  // -------------------------------------------
+ 
+  ///////////////////////////////////////////////////////////////////////////ELIMINAR CON LA X////////////////////////////////////////////////////////////////////////////
+  
 
   const removeProduct = (boxId: number, productId: number) => {
     // 1) Sacar el producto de la caja
@@ -142,9 +133,9 @@ export function usePackingManager(initial = 5) {
     });
   };
 
-  // -------------------------------------------
-  // FORMATO PARA EL COMPONENTE
-  // -------------------------------------------
+
+  ////////////////////////////////////////////////////////////// FORMATO PARA EL COMPONENTE//////////////////////////////////////////////////////////////////////////////////
+ 
 
   const boxes = productosPorCaja.map((productos, i) => ({
     id: i,

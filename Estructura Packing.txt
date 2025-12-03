@@ -1,0 +1,29 @@
+Estructura Packing 
+packing/                        ← Aquí vive todo lo relacionado con el proceso de Packing
+│
+├── App.tsx ← Aquí hacemos el renderizado de los componentes globales, aqui cargamos el PackingPage 
+│   
+├── pages/
+│   └── PackingPage.tsx ← La página principal donde se juntan todos los componentes los cuales ayudar a formar todo Packing
+│   
+├── hooks/
+│   ├── useProducts.ts ← Aquí tenemos el array de productos y un pedazo de logica la cual es para aumentar/disminuir en caja y Pro 
+│   ├── usePackingManager.ts  ← Lógica para poder buscar en los items que necesitamos. 
+│   ├── usePackingService.ts  ← Lógica para poder buscar en los items que necesitamos. 
+│   ├── useSearchProducts.ts  ← Lógica para poder buscar en los items que necesitamos. 
+│   └── usePagination.ts  ← Lógica de nuestros items, aqui por el momento array con unos items para exportar 
+│
+├── interfaces/
+│   └── Product.ts     		 ← Aqui estamos manejando la seccioón donde definimos los items│                               
+├── services/
+│   └── packing.service.ts      ← Aquí conectas con tu API (si la tienes)
+│                                Ej: guardar la distribución, traer productos desde backend
+│
+├── types/
+│   ├── Box.ts                  ← La forma/estructura de una “caja” (interfaces de TS)
+│   ├── Product.ts              ← La forma/estructura de un “producto”
+│   └── index.ts                ← (Opcional) Para exportar todos los tipos desde un solo archivo
+│
+└── utils/
+    ├── validations.ts          ← Funciones para validar cosas (límites, cantidades, etc.)
+    └── helpers.ts              ← Funciones útiles y pequeñas que ayudan en la lógica

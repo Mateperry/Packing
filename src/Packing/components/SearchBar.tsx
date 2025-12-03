@@ -29,10 +29,10 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
         type="text"
         value={value}
         onChange={onChange}
-        placeholder="Buscar producto..."
+        placeholder="Buscar producto"
         className="
           w-full text-sm 
-          sm:text-base 
+          sm:text-sm 
           focus:outline-none
         "
       />

@@ -12,7 +12,7 @@
 
 .my-scroll::-webkit-scrollbar-thumb {
   background: #cfcfcf;
-  border-radius: 20px;
+  border-radius: 10px;
 }
 
 .my-scroll::-webkit-scrollbar-thumb:hover {
@@ -20,7 +20,7 @@
 }
 /* Scrollbar general */
 ::-webkit-scrollbar {
-  width: 4px;           /* Grosor del scrollbar */
+  width: 6px;           /* Grosor del scrollbar */
 }
 
 /* Fondo del scrollbar */
