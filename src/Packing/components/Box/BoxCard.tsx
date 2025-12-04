@@ -1,41 +1,39 @@
+import { useState } from "react";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
 
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import CategoryIcon from '@mui/icons-material/Category';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import CancelIcon from '@mui/icons-material/Cancel';
+import CancelIcon from "@mui/icons-material/Cancel";
+import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
+import CategoryIcon from "@mui/icons-material/Category";
 
-import DroppableBox from "./DroppableBox";
+import DroppableBox from "../Box/DroppableBox";
 import BoxContend from "./BoxContend";
 
-import type { Product } from "../interfaces/Product";
+import type { Product } from "../../interfaces/Product";
 
 interface Props {
   titulo: string;
-  mostrarTitulo: boolean;
-  alternarTitulo: () => void;
   onEliminar: () => void;
   boxId: number;
   productos: Product[];
-  handleDecreaseProduct: (boxId: number, productId: number) => void;
-  removeProduct: (boxId: number, productId: number) => void;
+  decrementOne: (boxId: number, prodId: number) => void;
+  removeProduct: (boxId: number, prodId: number) => void;
 }
 
 export default function BoxCard({
   titulo,
-  mostrarTitulo,
-  alternarTitulo,
   onEliminar,
   boxId,
   productos,
-  handleDecreaseProduct,
+  decrementOne,
   removeProduct,
 }: Props) {
+  const [vistaDetallada, setVistaDetallada] = useState(true);
   const hasProducts = productos.length > 0;
 
   return (
@@ -45,29 +43,30 @@ export default function BoxCard({
         borderRadius: 3,
         border: "1px solid #e5e7eb",
         boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-        paddingY: 1,
-        marginY: 1,
+        py: 1,
+        my: 1,
       }}
     >
       {/* HEADER */}
       <CardHeader
-        title={mostrarTitulo ? titulo : ""}
+        title={titulo}
         action={
           <Box sx={{ display: "flex", gap: 1 }}>
-            <IconButton size="medium" onClick={alternarTitulo} title="Mostrar/ocultar título">
-              {mostrarTitulo ? (
-                <VisibilityOutlinedIcon sx={{ fontSize: 18 }} />
+            {/* OJO: cambia entre vista detallada y compacta */}
+            <IconButton
+              size="medium"
+              onClick={() => setVistaDetallada(!vistaDetallada)}
+              title="Cambiar vista"
+            >
+              {vistaDetallada ? (
+                <VisibilityOutlinedIcon sx={{ fontSize: 20 }} />
               ) : (
-                <VisibilityOffOutlinedIcon sx={{ fontSize: 18 }} />
+                <VisibilityOffOutlinedIcon sx={{ fontSize: 20 }} />
               )}
             </IconButton>
 
-            <IconButton
-              size="medium"
-              onClick={onEliminar}
-              title="Eliminar caja"
-              disabled={hasProducts}
-            >
+            {/* ELIMINAR CAJA */}
+            <IconButton size="medium" onClick={onEliminar} disabled={hasProducts}>
               <DeleteOutlineIcon
                 sx={{ fontSize: 18, color: hasProducts ? "gray" : "red" }}
               />
@@ -75,8 +74,8 @@ export default function BoxCard({
           </Box>
         }
         sx={{
-          paddingX: 2,
-          paddingY: 1,
+          px: 2,
+          py: 1,
           "& .MuiCardHeader-title": {
             fontSize: 14,
             fontWeight: 500,
@@ -84,7 +83,7 @@ export default function BoxCard({
         }}
       />
 
-      {/* CONTENEDOR DROPPABLE */}
+      {/* CONTENIDO (fijo, nunca desaparece) */}
       <DroppableBox boxId={boxId}>
         {!hasProducts ? (
           <BoxContend />
@@ -94,7 +93,7 @@ export default function BoxCard({
               <Box
                 key={prod.id}
                 sx={{
-                  padding: "8px 12px",
+                  p: "8px 12px",
                   borderRadius: "10px",
                   backgroundColor: "#F9FAFB",
                   border: "1px solid #E5E7EB",
@@ -115,26 +114,38 @@ export default function BoxCard({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      fontSize: 10,
-                      fontWeight: 100,
                       color: "white",
-                      backgroundColor: prod.quantity > 1 ? "#10B981" : "#F59E0B",
+                      backgroundColor: prod.color || "#F59E0B",
                     }}
                   >
                     <CategoryIcon sx={{ fontSize: 16 }} />
                   </Box>
 
-                  <span style={{ fontWeight: 400 }}>
-                    {prod.name} <strong>X{prod.quantity}</strong>
-                  </span>
+                  {/* DIFERENTE UI SEGÚN VISTA */}
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    {vistaDetallada ? (
+                      <>
+                        <span style={{ fontWeight: 500 }}>{prod.name} × {prod.quantity}</span>                        
+                        
+                      </>
+                    ) : (
+                      <>
+                        <span style={{ fontWeight: 450 }}>{prod.description}</span>                        
+                        
+                        {prod.description && (
+                          <span style={{ fontSize: 12, color: "#4B5563" }}>
+                            {prod.name} × {prod.quantity}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </Box>
                 </Box>
 
-                {/* DERECHA */}
+                {/* DERECHA: botones */}
                 <Box sx={{ display: "flex", gap: 1 }}>
-                  
-                  {/* 🔥 FIX: Aquí se arregla el error */}
                   <button
-                    onClick={() => handleDecreaseProduct(boxId, prod.id)}
+                    onClick={() => decrementOne(boxId, prod.id)}
                     className="py-1 transition text-sm"
                   >
                     <RemoveCircleIcon sx={{ fontSize: 22 }} />
@@ -142,7 +153,7 @@ export default function BoxCard({
 
                   <button
                     onClick={() => removeProduct(boxId, prod.id)}
-                    className="py-1 text-red-500 rounded transition text-sm"
+                    className="py-1 text-red-500 transition text-sm"
                   >
                     <CancelIcon sx={{ fontSize: 22 }} />
                   </button>

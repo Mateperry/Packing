@@ -1,23 +1,20 @@
-import type { Product } from "../interfaces/Product";
+import type { Product } from "../../interfaces/Product";
 import BoxCard from "./BoxCard";
 
 interface Props {
   boxes: { id: number; productos: Product[] }[];
   mostrarTitulos: boolean[];
-  alternarTitulo: (index: number) => void;
   eliminarCaja: (index: number) => void;
   agregarCaja: () => void;
-  handleDecreaseProduct: (boxId: number, productId: number) => void;
+  decrementOne: (boxId: number, productId: number) => void;
   removeProduct: (boxId: number, productId: number) => void;
 }
 
 export default function BoxList({
   boxes,
-  mostrarTitulos,
-  alternarTitulo,
   eliminarCaja,
   agregarCaja,
-  handleDecreaseProduct,
+  decrementOne,
   removeProduct,
 }: Props) {
   return (
@@ -31,12 +28,10 @@ export default function BoxList({
   <BoxCard
     key={index}
     titulo={`Caja ${index + 1}`}
-    mostrarTitulo={mostrarTitulos[index]}
-    alternarTitulo={() => alternarTitulo(index)}
     onEliminar={() => eliminarCaja(index)}
-    boxId={index} //  ESTE ES EL IMPORTANTE
+    boxId={box.id} //  ESTE ES EL IMPORTANTE
     productos={box.productos}
-    handleDecreaseProduct={handleDecreaseProduct}
+    decrementOne={decrementOne}
     removeProduct={removeProduct}
   />
 ))}
@@ -44,17 +39,30 @@ export default function BoxList({
       </div>
 
       {/* BOTÓN PARA AGREGAR CAJA */}
+<p className="text-center mt-4 text-gray-700 text-xs">
+  Total de cajas: <strong>{boxes.length}</strong>
+</p>
+
       <button
         onClick={agregarCaja}
-        className="flex items-center gap-2 mx-auto mt-6 bg-orange-500 text-white px-6 py-3 rounded-full font-medium shadow hover:bg-orange-600 transition"
+        className="flex items-center gap-2 mx-auto mt-2 bg-orange-500 text-white px-6 py-3 rounded-full font-medium shadow hover:bg-orange-600 transition"
       >
         + Agregar caja
       </button>
 
       {/* CONTADOR */}
-      <p className="text-center mt-4 text-gray-700">
-        Total de cajas: <strong>{boxes.length}</strong>
-      </p>
+
+      <p className="text-center mt-2 text-gray-700">
+        Total de Productos:{" "}
+      <strong>
+    {boxes.reduce(
+      (totalItems, box) =>
+        totalItems + box.productos.reduce((sum, item) => sum + item.quantity, 0),
+      0
+    )}
+  </strong>
+</p>
+
     </div>
   );
 }

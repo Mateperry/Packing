@@ -6,4 +6,6 @@ export interface Product {
   name: string;
   description: string;
   quantity: number;
+  color?: string;
+  ref?: React.RefObject<HTMLDivElement>; 
 }

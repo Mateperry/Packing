@@ -5,9 +5,9 @@
 //
 // IMPORTACIONES
 import { DndContext } from "@dnd-kit/core"; // Aqui traemos la erramienta para poder mover las cosas, el arrastras y soltar que aplicaremos en las productos, necesaria la herramienta
-import ProductList from "../components/ProductList"; //Aqui importamos el componente de la lista de productos que mostraremos en pantalla, lo que es el componente principal de los productos
-import BoxList from "../components/Boxlist"; // Aqui importamos el componente de la lista de cajas que mostraremos en pantalla, lo que es el componente principal de las cajas
-import HomeButtons from "../components/HomeButtons";// Aqui importamos el componente de los botones principales que mostraremos en pantalla los dos principales que son Cancelar Proceso y Finalizar proceso
+import ProductList from "../components/Products/ProductList"; //Aqui importamos el componente de la lista de productos que mostraremos en pantalla, lo que es el componente principal de los productos
+import BoxList from "../components/Box/Boxlist"; // Aqui importamos el componente de la lista de cajas que mostraremos en pantalla, lo que es el componente principal de las cajas
+import HomeButtons from "../components/common/HomeButtons";// Aqui importamos el componente de los botones principales que mostraremos en pantalla los dos principales que son Cancelar Proceso y Finalizar proceso
 import { usePackingService } from "../Hooks/usePackingService"; // Este es el asistente personal, un hook que guarda todos los datos y funciones necesarias para organizar los productos.
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -18,12 +18,11 @@ function PackingPage() {
     products, // Lista de productos disponibles para empacar 
     boxes,     // Lista de cajas con productos empacados                                     
     mostrarTitulos, // Estado que indica si se deben mostrar los títulos de las cajas   
-    alternarTitulo, // Función para alternar la visibilidad del título de una caja
     eliminarCaja,// Función para eliminar una caja
     aumentarCajas, // Función para aumentar el número de cajas
     handleDragEnd, // Función para manejar el evento de finalización del arrastre
     handleRemoveProduct, // Función para manejar la eliminación de un producto
-    handleUpdateQuantity, // Función para manejar la actualización de la cantidad de un producto
+    decrementOne, // Función para manejar la actualización de la cantidad de un producto
     
   } = usePackingService(); // Aquí usamos el asistente para obtener los datos y funciones necesarias
 // /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,10 +50,9 @@ function PackingPage() {
             <BoxList 
               boxes={boxes} // Lista de cajas con productos empacados
               mostrarTitulos={mostrarTitulos} // Estado que indica si se deben mostrar los títulos de las cajas
-              alternarTitulo={alternarTitulo} // Función para alternar la visibilidad del título de una caja
               eliminarCaja={eliminarCaja} // Función para eliminar una caja
               agregarCaja={aumentarCajas} // Función para aumentar el número de cajas
-              updateProductQuantity={handleUpdateQuantity} // Función para actualizar la cantidad de un producto en una caja
+              decrementOne={decrementOne} // Función para actualizar la cantidad de un producto en una caja
               removeProduct={handleRemoveProduct} // Función para eliminar un producto de una caja
             />
           </div>

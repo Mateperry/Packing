@@ -1,18 +1,19 @@
 import { useDraggable } from "@dnd-kit/core";
 import ProductItem from "./ProductItem";
-import type { Product } from "../interfaces/Product";
+import type { Product } from "../../interfaces/Product";
 
 interface Props {
   product: Product;
-  disabled?: boolean; // ✅ Nueva prop para deshabilitar
+  disabled?: boolean;
+  showDescription: boolean; //  NUEVO
 }
 
-export default function DraggableProduct({ product, disabled = false }: Props) {
+export default function DraggableProduct({ product, disabled = false, showDescription }: Props) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `product-${product.id}`,
       data: { type: "PRODUCT", product },
-      disabled, // ✅ Deshabilita drag si es true
+      disabled,
     });
 
   const style = transform
@@ -26,11 +27,11 @@ export default function DraggableProduct({ product, disabled = false }: Props) {
       {...attributes}
       style={{
         ...style,
-        opacity: disabled ? 0.4 : isDragging ? 0.4 : 1, // ✨ Más visible si está deshabilitado
+        opacity: disabled ? 0.4 : isDragging ? 0.4 : 1,
         cursor: disabled ? "not-allowed" : "grab",
       }}
     >
-      <ProductItem product={product} />
+      <ProductItem product={product} showDescription={showDescription} />
     </div>
   );
 }

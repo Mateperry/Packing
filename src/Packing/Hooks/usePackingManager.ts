@@ -26,21 +26,15 @@ export function usePackingManager(initial = 6) { // Valor inicial de cajas a mos
 ///////////////////////////////////////////////////////////////////////// Control de Aumento de cajas /////////////////////////////////////////////////////////
 
   const aumentarCajas = () => {
-    const hayCajaVacia = productosPorCaja.some((caja) => caja.length === 0);
-    if (hayCajaVacia) return;
+    //const hayCajaVacia = productosPorCaja.some((caja) => caja.length === 0);
+    //if (hayCajaVacia) return;
+    
 
-    setCantidadDeCajas((prev) => prev + 1);
-    setMostrarTitulos((prev) => [...prev, true]);
-    setProductosPorCaja((prev) => [...prev, []]);
+    setCantidadDeCajas((prev) => prev + 1); // Incrementa la cantidad de cajas en 1
+    setMostrarTitulos((prev) => [...prev, true]);// Añade un nuevo título visible para la nueva caja
+    setProductosPorCaja((prev) => [...prev, []]);// Añade una nueva caja vacía al array de cajas
   };
-///////////////////////////////////////////////////////////////////////// Control de Mostrar Titulo /////////////////////////////////////////////////////////
-  const alternarTitulo = (index: number) => {
-    setMostrarTitulos((prev) => {
-      const copy = [...prev];
-      copy[index] = !copy[index];
-      return copy;
-    });
-  };
+
 ////////////////////////////////////////////////////////////////////////// Control de Eliminar Caja /////////////////////////////////////////////////////////
   const eliminarCaja = (index: number) => {
     if (cantidadDeCajas === 1) return;
@@ -79,32 +73,43 @@ export function usePackingManager(initial = 6) { // Valor inicial de cajas a mos
   };
 
 ////////////////////////////////////////////////////////////////////////////// Actualizar Cantidad de Producto en Caja /////////////////////////////////////////////////
-
-const updateProductQuantity = (
-  boxId: number,
-  productId: number,
-  delta: number
-) => {
+const decrementOne = (boxId: number, productId: number) => {
   setProductosPorCaja((prev) => {
     const copy = [...prev];
-    const productos = [...copy[boxId]];
-    const index = productos.findIndex((p) => p.id === productId);
-    if (index === -1) return prev;
+    const productosCaja = [...copy[boxId]];
 
-    const newQuantity = productos[index].quantity + delta;
+    // Buscar el producto dentro de la caja
+    const productIndex = productosCaja.findIndex((p) => p.id === productId);
+    if (productIndex === -1) return prev; // No existe
+
+    const product = productosCaja[productIndex];
+
+    // 1) Devolver UNA unidad al inventario global
+    setProductos((prevInv) =>
+      prevInv.map((p) =>
+        p.id === productId ? { ...p, quantity: p.quantity + 1 } : p
+      )
+    );
+
+    // 2) Restar una unidad dentro de la caja
+    const newQuantity = product.quantity - 1;
 
     if (newQuantity <= 0) {
-      productos.splice(index, 1);
+      // si queda en 0, eliminar el producto de la caja
+      productosCaja.splice(productIndex, 1);
     } else {
-      productos[index] = { ...productos[index], quantity: newQuantity };
+      // si aún quedan unidades, actualizar la cantidad
+      productosCaja[productIndex] = {
+        ...product,
+        quantity: newQuantity,
+      };
     }
 
-    copy[boxId] = productos;
+    copy[boxId] = productosCaja;
     return copy;
   });
 };
 
- 
   ///////////////////////////////////////////////////////////////////////////ELIMINAR CON LA X////////////////////////////////////////////////////////////////////////////
   
 
@@ -148,12 +153,11 @@ const updateProductQuantity = (
     productosPorCaja,
     productos, // inventario global
     aumentarCajas,
-    alternarTitulo,
     eliminarCaja,
     agregarProductoACaja,
     boxes,
     addToBox: agregarProductoACaja,
-    updateProductQuantity,
+    decrementOne,
     removeProduct,
   };
 }

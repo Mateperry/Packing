@@ -16,8 +16,8 @@ export function useProducts() {
     // Arrat con Id, nombre, descripcion y cantidad inicial de cada producto 
     { id: 1, name: "AXN02N", description: "F-TOALLA MANO FAN-7710R M/Y GRANDE", quantity: 1 },
     { id: 2, name: "AXN02P", description: "PRODUCTO B", quantity: 1 },
-    { id: 3, name: "AXN02Q", description: "PRODUCTO C", quantity: 1 },
-    { id: 4, name: "AXN03B", description: "PRODUCTO G", quantity: 1 },
+    { id: 3, name: "AXN02Q", description: "PRODUCTO C", quantity: 100 },
+    { id: 4, name: "AXN03B", description: "PRODUCTO G", quantity: 101 },
     { id: 5, name: "AXN02X", description: "PRODUCTO D", quantity: 2 },
     { id: 6, name: "AXN02Z", description: "PRODUCTO E", quantity: 5 },
     { id: 7, name: "AXN03A", description: "PRODUCTO F", quantity: 3 },
