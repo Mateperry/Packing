@@ -115,7 +115,7 @@ export default function BoxCard({
                       alignItems: "center",
                       justifyContent: "center",
                       color: "white",
-                      backgroundColor: prod.color || "#F59E0B",
+                      backgroundColor: prod.color || "#000000",
                     }}
                   >
                     <CategoryIcon sx={{ fontSize: 16 }} />

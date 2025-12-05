@@ -1,15 +1,16 @@
+
 import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
 import type { Product } from "../../interfaces/Product";
 import { useState, useEffect } from "react";
 
 interface Props {
   product: Product;
-  showDescription: boolean; // 👁 NUEVO
+  showDescription: boolean; //  NUEVO
 }
 
 function ProductItem({ product, showDescription }: Props) {
 
-  const [color, setColor] = useState(product.color || "#F59E0B");
+  const [color, setColor] = useState(product.color || "#000000");
 
   useEffect(() => {
     if (product.quantity >= 100 && product.color !== "#10B981") {
