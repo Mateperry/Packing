@@ -143,21 +143,27 @@ export default function BoxCard({
                 </Box>
 
                 {/* DERECHA: botones */}
-                <Box sx={{ display: "flex", gap: 1 }}>
-                  <button
-                    onClick={() => decrementOne(boxId, prod.id)}
-                    className="py-1 transition text-sm"
-                  >
-                    <RemoveCircleIcon sx={{ fontSize: 22 }} />
-                  </button>
+<Box sx={{ display: "flex", gap: 1 }}>
 
-                  <button
-                    onClick={() => removeProduct(boxId, prod.id)}
-                    className="py-1 text-red-500 transition text-sm"
-                  >
-                    <CancelIcon sx={{ fontSize: 22 }} />
-                  </button>
-                </Box>
+  {/* SOLO MOSTRAR EL BOTÓN DE RESTAR SI quantity >= 2 */}
+  {prod.quantity >= 2 && (
+    <button
+      onClick={() => decrementOne(boxId, prod.id)}
+      className="py-1 transition text-sm"
+    >
+      <RemoveCircleIcon sx={{ fontSize: 22 }} />
+    </button>
+  )}
+
+  {/* BOTÓN DE ELIMINAR (SIEMPRE APARECE) */}
+  <button
+    onClick={() => removeProduct(boxId, prod.id)}
+    className="py-1 text-red-500 transition text-sm"
+  >
+    <CancelIcon sx={{ fontSize: 22 }} />
+  </button>
+</Box>
+
               </Box>
             ))}
           </Box>

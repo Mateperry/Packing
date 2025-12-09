@@ -21,7 +21,7 @@ export function useProducts() {
     { id: 5, name: "AXN02X", description: "PRODUCTO D", quantity: 2 },
     { id: 6, name: "AXN02Z", description: "PRODUCTO E", quantity: 5 },
     { id: 7, name: "AXN03A", description: "PRODUCTO F", quantity: 3 },
-    { id: 8, name: "AXN03C", description: "PRODUCTO H", quantity: 2 },
+    { id: 8, name: "AXN03C", description: "PRODUCTO H", quantity: 6 },
   ]);
 
   // Reducir cantidad (cuando agregas a caja) y modificar cuanta cantidad hay en product List 

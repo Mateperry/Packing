@@ -5,10 +5,16 @@ import type { Product } from "../../interfaces/Product";
 interface Props {
   product: Product;
   disabled?: boolean;
-  showDescription: boolean; //  NUEVO
+  showDescription: boolean;
+  onOpenAssign?: () => void;
 }
 
-export default function DraggableProduct({ product, disabled = false, showDescription }: Props) {
+export default function DraggableProduct({
+  product,
+  disabled = false,
+  showDescription,
+  onOpenAssign
+}: Props) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({
       id: `product-${product.id}`,
@@ -23,15 +29,29 @@ export default function DraggableProduct({ product, disabled = false, showDescri
   return (
     <div
       ref={setNodeRef}
-      {...listeners}
       {...attributes}
+      {...listeners}
       style={{
         ...style,
         opacity: disabled ? 0.4 : isDragging ? 0.4 : 1,
         cursor: disabled ? "not-allowed" : "grab",
       }}
+
+      // 🟦 SOLUCIÓN A BLOQUEO DE CLICK
+      onPointerDown={(e) => {
+        // si el click viene del botón de asignar → permitirlo
+        const isAssignButton = (e.target as HTMLElement).closest(".no-drag");
+        if (isAssignButton) {
+          e.stopPropagation();
+          return; // NO PREVENT DEFAULT → permite click normal
+        }
+      }}
     >
-      <ProductItem product={product} showDescription={showDescription} />
+      <ProductItem
+        product={product}
+        showDescription={showDescription}
+        onOpenAssign={onOpenAssign}
+      />
     </div>
   );
 }

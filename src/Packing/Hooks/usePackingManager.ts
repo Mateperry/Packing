@@ -1,146 +1,116 @@
 // src/Packing/Hooks/usePackingManager.ts
-// Controla toda la lógica de empacar productos en cajas, manteniendo sincronizado el inventario y lo que hay dentro de cada caja.
-//
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// Importaciones de React y tipos 
-import { useState } from "react"; // useState para manejar estados internos
-import type { Product } from "../interfaces/Product"; // Tipo Product para definir la estructura de los productos
+import { useState } from "react";
+import type { Product } from "../interfaces/Product";
 
-// Hook personalizado para gestionar el empaquetado de productos en cajas, manteniendo sincronizado el inventario y lo que hay dentro de cada caja
-
-export function usePackingManager(initial = 6) { // Valor inicial de cajas a mostrar 6 
-  const [cantidadDeCajas, setCantidadDeCajas] = useState(initial); // Estado para la cantidad de cajas empezamos en el valor initial (6)
-  const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>( // Estado para controlar si se muestran los títulos de las cajas 
-    Array(initial).fill(true) // Inicialmente todos los títulos están visibles 
+export function usePackingManager(initial = 6) {
+  const [cantidadDeCajas, setCantidadDeCajas] = useState(initial);
+  const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>(
+    Array(initial).fill(true)
   );
-/////////////////////////////////////////////////////////////////////// Control de Items "" ////////////////////////////////////////////////////////// 
-  // INVENTARIO GLOBAL ORIGINAL
-  const [productos, setProductos] = useState<Product[]>([]); // Estado para el inventario global de productos No estan dentrdo de las cajas 
 
-  // PRODUCTOS DENTRO DE LAS CAJAS 
-  const [productosPorCaja, setProductosPorCaja] = useState<  // Estado para los productos dentro de cada caja  
-    (Product & { quantity: number })[][] // Cada caja contiene un array de productos con su cantidad 
-  >(Array.from({ length: initial }, () => [])); // Inicialmente hay 'initial' cajas vacías 
+  // inventario local (puede estar vacío; la fuente de verdad es useProducts)
+  const [productos, setProductos] = useState<Product[]>([]);
 
-///////////////////////////////////////////////////////////////////////// Control de Aumento de cajas /////////////////////////////////////////////////////////
+  // productos por caja (cada caja: array de { ...Product, quantity })
+  const [productosPorCaja, setProductosPorCaja] = useState<
+    (Product & { quantity: number })[][]
+  >(Array.from({ length: initial }, () => []));
 
   const aumentarCajas = () => {
-    //const hayCajaVacia = productosPorCaja.some((caja) => caja.length === 0);
-    //if (hayCajaVacia) return;
-    
-
-    setCantidadDeCajas((prev) => prev + 1); // Incrementa la cantidad de cajas en 1
-    setMostrarTitulos((prev) => [...prev, true]);// Añade un nuevo título visible para la nueva caja
-    setProductosPorCaja((prev) => [...prev, []]);// Añade una nueva caja vacía al array de cajas
+    setCantidadDeCajas((p) => p + 1);
+    setMostrarTitulos((p) => [...p, true]);
+    setProductosPorCaja((p) => [...p, []]);
   };
 
-////////////////////////////////////////////////////////////////////////// Control de Eliminar Caja /////////////////////////////////////////////////////////
   const eliminarCaja = (index: number) => {
     if (cantidadDeCajas === 1) return;
-
-    setCantidadDeCajas((prev) => prev - 1);
-    setMostrarTitulos((prev) => prev.filter((_, i) => i !== index));
-    setProductosPorCaja((prev) => prev.filter((_, i) => i !== index));
+    setCantidadDeCajas((p) => p - 1);
+    setMostrarTitulos((p) => p.filter((_, i) => i !== index));
+    setProductosPorCaja((p) => p.filter((_, i) => i !== index));
   };
-//////////////////////////////////////////////////////////////////////// Agregar Producto a Caja /////////////////////////////////////////////////////////
-  const agregarProductoACaja = (index: number, product: Product) => {
-    // 1) Descontar 1 del inventario global
-    setProductos((prev) =>
-      prev.map((p) =>
-        p.id === product.id ? { ...p, quantity: p.quantity - 1 } : p
-      )
-    );
 
-    // 2) Agregar dentro de la caja
+  /**
+   * addToBox flexible:
+   * - addToBox(boxId, product: Product, amount = 1)
+   * - addToBox(boxId, productId: number, amount = 1)
+   *
+   * Si recibe Product lo usa directamente (preferido).
+   * Si recibe productId intenta buscar en `productos` (compatibilidad).
+   */
+  const addToBox = (
+    boxId: number,
+    productOrId: Product | number,
+    amount = 1
+  ) => {
     setProductosPorCaja((prev) => {
       const copy = [...prev];
-      const productos = [...copy[index]];
-      const existingIndex = productos.findIndex((p) => p.id === product.id);
+      const productosCaja = [...(copy[boxId] || [])];
 
-      if (existingIndex >= 0) {
-        productos[existingIndex] = {
-          ...productos[existingIndex],
-          quantity: productos[existingIndex].quantity + 1,
+      // Resolver producto
+      let productObj: Product | undefined;
+      if (typeof productOrId === "number") {
+        productObj = productos.find((p) => p.id === productOrId);
+      } else {
+        productObj = productOrId;
+      }
+
+      if (!productObj) {
+        const id = typeof productOrId === "number" ? productOrId : productOrId.id;
+        productObj = {
+          id,
+          name: (typeof productOrId === "number" ? `Producto ${id}` : productOrId.name) || "Sin nombre",
+          description: (typeof productOrId === "number" ? "" : productOrId.description) || "",
+          quantity: 0,
+        } as Product;
+      }
+
+      const idx = productosCaja.findIndex((p) => p.id === productObj!.id);
+
+      if (idx >= 0) {
+        // ya existe dentro de la caja -> sumar cantidad
+        productosCaja[idx] = {
+          ...productosCaja[idx],
+          quantity: productosCaja[idx].quantity + amount,
         };
       } else {
-        productos.push({ ...product, quantity: 1 });
+        // insertar nuevo con la cantidad indicada
+        productosCaja.push({
+          ...productObj!,
+          quantity: amount,
+        });
       }
 
-      copy[index] = productos;
+      copy[boxId] = productosCaja;
       return copy;
     });
   };
 
-////////////////////////////////////////////////////////////////////////////// Actualizar Cantidad de Producto en Caja /////////////////////////////////////////////////
-const decrementOne = (boxId: number, productId: number) => {
-  setProductosPorCaja((prev) => {
-    const copy = [...prev];
-    const productosCaja = [...copy[boxId]];
-
-    // Buscar el producto dentro de la caja
-    const productIndex = productosCaja.findIndex((p) => p.id === productId);
-    if (productIndex === -1) return prev; // No existe
-
-    const product = productosCaja[productIndex];
-
-    // 1) Devolver UNA unidad al inventario global
-    setProductos((prevInv) =>
-      prevInv.map((p) =>
-        p.id === productId ? { ...p, quantity: p.quantity + 1 } : p
-      )
-    );
-
-    // 2) Restar una unidad dentro de la caja
-    const newQuantity = product.quantity - 1;
-
-    if (newQuantity <= 0) {
-      // si queda en 0, eliminar el producto de la caja
-      productosCaja.splice(productIndex, 1);
-    } else {
-      // si aún quedan unidades, actualizar la cantidad
-      productosCaja[productIndex] = {
-        ...product,
-        quantity: newQuantity,
-      };
-    }
-
-    copy[boxId] = productosCaja;
-    return copy;
-  });
-};
-
-  ///////////////////////////////////////////////////////////////////////////ELIMINAR CON LA X////////////////////////////////////////////////////////////////////////////
-  
-
-  const removeProduct = (boxId: number, productId: number) => {
-    // 1) Sacar el producto de la caja
+  const decrementOne = (boxId: number, productId: number) => {
     setProductosPorCaja((prev) => {
       const copy = [...prev];
-      const productosCaja = copy[boxId];
+      const productosCaja = [...(copy[boxId] || [])];
+      const i = productosCaja.findIndex((p) => p.id === productId);
+      if (i === -1) return prev;
 
-      const product = productosCaja.find((p) => p.id === productId);
-
-      // 2) Devolver TODA la cantidad al inventario global
-      if (product) {
-        setProductos((prevInv) =>
-          prevInv.map((p) =>
-            p.id === productId
-              ? { ...p, quantity: p.quantity + product.quantity }
-              : p
-          )
-        );
+      const prod = productosCaja[i];
+      if (prod.quantity <= 1) {
+        productosCaja.splice(i, 1);
+      } else {
+        productosCaja[i] = { ...prod, quantity: prod.quantity - 1 };
       }
 
-      // 3) Eliminarlo de la caja
-      copy[boxId] = productosCaja.filter((p) => p.id !== productId);
+      copy[boxId] = productosCaja;
       return copy;
     });
   };
 
-
-  ////////////////////////////////////////////////////////////// FORMATO PARA EL COMPONENTE//////////////////////////////////////////////////////////////////////////////////
- 
+  const removeProduct = (boxId: number, productId: number) => {
+    setProductosPorCaja((prev) => {
+      const copy = [...prev];
+      copy[boxId] = (prev[boxId] || []).filter((p) => p.id !== productId);
+      return copy;
+    });
+  };
 
   const boxes = productosPorCaja.map((productos, i) => ({
     id: i,
@@ -150,14 +120,16 @@ const decrementOne = (boxId: number, productId: number) => {
   return {
     cantidadDeCajas,
     mostrarTitulos,
+    productos, // inventario local (puede permanecer vacío)
     productosPorCaja,
-    productos, // inventario global
+
     aumentarCajas,
     eliminarCaja,
-    agregarProductoACaja,
-    boxes,
-    addToBox: agregarProductoACaja,
+
+    addToBox, // firma flexible: (boxId, product|id, amount)
     decrementOne,
     removeProduct,
+
+    boxes,
   };
 }
