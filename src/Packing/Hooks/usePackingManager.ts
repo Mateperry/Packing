@@ -9,7 +9,7 @@ export function usePackingManager(initial = 6) {
   );
 
   // inventario local (puede estar vacío; la fuente de verdad es useProducts)
-  const [productos, setProductos] = useState<Product[]>([]);
+  const [productos, ] = useState<Product[]>([]);
 
   // productos por caja (cada caja: array de { ...Product, quantity })
   const [productosPorCaja, setProductosPorCaja] = useState<
