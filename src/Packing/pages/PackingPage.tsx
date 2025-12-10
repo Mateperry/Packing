@@ -54,6 +54,7 @@ function PackingPage() {
             assignToBox={assignToBox}
             assignToMultipleBoxes={assignToMultipleBoxes}
             decreaseQuantity={decreaseQuantity}
+            
           />
 
           {/* Contenedor de cajas */}

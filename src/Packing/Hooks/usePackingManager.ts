@@ -2,7 +2,7 @@
 import { useState } from "react";
 import type { Product } from "../interfaces/Product";
 
-export function usePackingManager(initial = 6) {
+export function usePackingManager(initial = 1) {
   const [cantidadDeCajas, setCantidadDeCajas] = useState(initial);
   const [mostrarTitulos, setMostrarTitulos] = useState<boolean[]>(
     Array(initial).fill(true)

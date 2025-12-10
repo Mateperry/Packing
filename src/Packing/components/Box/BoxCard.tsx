@@ -125,18 +125,18 @@ export default function BoxCard({
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     {vistaDetallada ? (
                       <>
-                        <span style={{ fontWeight: 500 }}>{prod.name} × {prod.quantity}</span>                        
-                        
-                      </>
-                    ) : (
-                      <>
-                        <span style={{ fontWeight: 450 }}>{prod.description}</span>                        
+                                              
+                                                <span style={{ fontWeight: 450 }}>{prod.description}</span>                        
                         
                         {prod.description && (
                           <span style={{ fontSize: 12, color: "#4B5563" }}>
                             {prod.name} × {prod.quantity}
                           </span>
                         )}
+                      </>
+                    ) : (
+                      <>
+<span style={{ fontWeight: 500 }}>{prod.name} × {prod.quantity}</span>  
                       </>
                     )}
                   </Box>

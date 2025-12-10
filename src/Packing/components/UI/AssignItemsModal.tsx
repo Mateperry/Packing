@@ -1,4 +1,4 @@
-// src/Packing/components/AssignItemsModal.tsx
+// src/Packing/components/UI/AssignItemsModal.tsx
 import { useState } from "react";
 import Modal from "./Modal";
 import type { Product } from "../../interfaces/Product";
@@ -62,6 +62,7 @@ export default function AssignItemsModal({
         </label>
       </div>
 
+      {/* Modo UNA caja */}
       {mode === "one" && (
         <div className="space-y-4">
           <label className="block">
@@ -88,6 +89,7 @@ export default function AssignItemsModal({
         </div>
       )}
 
+      {/* Modo VARIAS cajas */}
       {mode === "multiple" && (
         <div className="space-y-4">
           <label className="block">
@@ -106,7 +108,6 @@ export default function AssignItemsModal({
             <input
               type="number"
               min={1}
-              max={boxes.length}
               className="w-full mt-2 border rounded p-2"
               value={numberOfBoxes}
               onChange={(e) => setNumberOfBoxes(Number(e.target.value))}
@@ -122,9 +123,10 @@ export default function AssignItemsModal({
           <button
             className="w-full bg-blue-600 text-white rounded py-2 mt-3 disabled:bg-gray-400"
             disabled={isInvalid}
-            onClick={() =>
-              onAssignToMultipleBoxes(amountPerBox, numberOfBoxes)
-            }
+            onClick={() => {
+              onAssignToMultipleBoxes(amountPerBox, numberOfBoxes);
+              onClose();
+            }}
           >
             Repartir en cajas
           </button>
