@@ -45,7 +45,8 @@ function ProductList({
   const { page, totalPages, currentItems, nextPage, prevPage, resetPage } =
     usePagination(filtered, itemsPerPage);
 
-  const { visible: showDescription, toggle } = useToggleVisibility(false);
+const { visible: showDescription, toggle } = useToggleVisibility(true);
+
 
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
     onChange(e);
@@ -79,7 +80,7 @@ function ProductList({
         <div className="absolute top-1 right-1 bg-transparent">
           <EyeToggleButton active={showDescription} onToggle={toggle} size={15} />
         </div>
-        <span className="text-base sm:text-xs md:text-xs lg:text-base">Cantidad de ítems:</span>
+        <span className="text-base sm:text-xs md:text-xs lg:text-base">Cantidad de SKU:</span>
         <span className="text-base sm:text-sm md:text-sm lg:text-base font-semibold">
           {filtered.length}
         </span>

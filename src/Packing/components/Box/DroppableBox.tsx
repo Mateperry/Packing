@@ -1,4 +1,3 @@
-// DroppableBox.tsx
 import { useDroppable } from "@dnd-kit/core";
 
 interface Props {
@@ -15,13 +14,16 @@ export default function DroppableBox({ boxId, children }: Props) {
   return (
     <div
       ref={setNodeRef}
+      className="
+        text-sm sm:text-xs md:text-xs lg:text-sm
+        rounded-xl
+        min-h-[140px]
+        max-h-[250px]
+        p-1
+        overflow-y-auto
+      "
       style={{
         border: isOver ? "2px dashed #31C950" : "2px solid transparent",
-        borderRadius: "12px",
-        minHeight: 140,
-        maxHeight: 200,
-        padding: 12,
-        overflowY: "auto",
       }}
     >
       {children}

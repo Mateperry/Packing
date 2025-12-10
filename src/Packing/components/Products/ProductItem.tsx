@@ -7,10 +7,11 @@ interface Props {
   product: Product;
   showDescription: boolean;
   onOpenAssign?: () => void;
+  descriptionTruncated?: string; // recibido desde DraggableProduct
 }
 
-function ProductItem({ product, showDescription, onOpenAssign }: Props) {
-  const [color, setColor] = useState(product.color || "#000000");
+function ProductItem({ product, showDescription, onOpenAssign, descriptionTruncated }: Props) {
+  const [color, setColor] = useState(product.color || "#111111");
 
   useEffect(() => {
     if (product.quantity >= 100 && product.color !== "#10B981") {
@@ -33,12 +34,18 @@ function ProductItem({ product, showDescription, onOpenAssign }: Props) {
         <LocalMallOutlinedIcon />
       </div>
 
-      {/* Nombre */}
+      {/* Texto principal:
+          - si showDescription === true => mostramos descripción TRUNCADA (20 chars)
+          - si showDescription === false => mostramos el NOMBRE del producto
+      */}
       <div className="text-gray-700 font-medium text-center">
-        {showDescription ? product.name : product.description}
+        {showDescription
+  ? (descriptionTruncated || product.description || product.name)
+  : product.name}
+
       </div>
 
-      {/* Botón asignar */}
+      {/* Botón asignar (no-drag) */}
       {product.quantity > 5 && (
         <button
           className="absolute top-3 right-3 p-3 bg-green-200 rounded-full shadow-md hover:bg-green-300 active:scale-95 transition no-drag"
