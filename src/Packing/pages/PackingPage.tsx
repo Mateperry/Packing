@@ -12,7 +12,9 @@ import ProductList from "../components/Products/ProductList";
 import BoxList from "../components/Box/Boxlist";
 import HomeButtons from "../components/common/HomeButtons";
 import DragQuantityModal from "../components/UI/DragQuantityModal";
+import ReadyBoxesPanel from "../components/UI/ReadyBoxesPanel";
 import { usePackingService } from "../Hooks/usePackingService";
+import { useBoxShipping } from "../Hooks/useBoxShipping";
 
 function PackingPage() {
   const {
@@ -33,7 +35,42 @@ function PackingPage() {
     closeQuantityModal,
     updateQuantityModalQuantity,
     handleConfirmDragQuantity,
+    resetBox,
+    restoreProductsToFirstEmptyBox,
+    restoreProductsToIndex,
   } = usePackingService();
+
+  const { readyBoxes, markBoxReady, unmarkBoxReady } = useBoxShipping();
+
+  const handleMarkBoxReady = (boxId: number, productos: any[]) => {
+    // create a title based on position (human-friendly)
+    markBoxReady({
+      titulo: `Caja ${boxId + 1}`,
+      productos,
+      sourceIndex: boxId,
+    });
+
+    // reset the current box to be empty (keeps slot number)
+    resetBox(boxId);
+  };
+
+  const handleRestoreReady = (readyBoxId: number) => {
+    const box = readyBoxes.find((b) => b.id === readyBoxId);
+    if (!box) return;
+
+    // Prefer restore to the original sourceIndex if available and empty.
+    const sourceIndex = typeof box.sourceIndex === "number" ? box.sourceIndex : undefined;
+    if (typeof sourceIndex === "number" && boxes[sourceIndex] && boxes[sourceIndex].productos.length === 0) {
+      restoreProductsToIndex(sourceIndex, box.productos.map((p) => ({ ...p })) as any);
+    } else {
+      // Otherwise restore to the first empty box available
+      restoreProductsToFirstEmptyBox(box.productos.map((p) => ({ ...p })) as any);
+    }
+
+    // remove from ready list
+    unmarkBoxReady(readyBoxId);
+  };
+
 
   const sensors = useSensors(
     useSensor(MouseSensor),
@@ -63,6 +100,7 @@ function PackingPage() {
 
           {/* Contenedor de cajas */}
           <div className="flex-1 bg-gray-50 rounded-xl p-2 shadow-inner">
+            {/* pass total item count (sum of quantities) so BoxList shows 'Ya empacamos todo' only when inventory is empty */}
             <BoxList
               boxes={boxes}
               mostrarTitulos={mostrarTitulos}
@@ -70,10 +108,19 @@ function PackingPage() {
               agregarCaja={aumentarCajas}
               decrementOne={decrementOne}
               removeProduct={handleRemoveProduct}
+              onMarkBoxReady={handleMarkBoxReady}
+              readyBoxIds={readyBoxes.map((b) => b.sourceIndex ?? -1)}
+              productsCount={products.reduce((sum, p) => sum + (p.quantity || 0), 0)}
             />
           </div>
         </div>
       </DndContext>
+
+      {/* Panel de cajas listas para envío */}
+      <ReadyBoxesPanel
+        readyBoxes={readyBoxes}
+        onRestore={handleRestoreReady}
+      />
 
       {/* Modal de cantidad para drag & drop */}
       <DragQuantityModal

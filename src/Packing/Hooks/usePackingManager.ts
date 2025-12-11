@@ -22,6 +22,63 @@ export function usePackingManager(initial = 1) {
     setProductosPorCaja((p) => [...p, []]);
   };
 
+  const ensureBoxes = (n: number) => {
+    setProductosPorCaja((prev) => {
+      const copy = [...prev];
+      while (copy.length < n) copy.push([]);
+      return copy;
+    });
+    setCantidadDeCajas((prev) => (prev < n ? n : prev));
+    setMostrarTitulos((prev) => {
+      const copy = [...prev];
+      while (copy.length < n) copy.push(true);
+      return copy;
+    });
+  };
+
+  const resetBox = (index: number) => {
+    setProductosPorCaja((prev) => {
+      const copy = [...prev];
+      if (index >= 0 && index < copy.length) {
+        copy[index] = [];
+      }
+      return copy;
+    });
+  };
+
+  const restoreProductsToFirstEmptyBox = (products: (Product & { quantity: number })[]) => {
+    setProductosPorCaja((prev) => {
+      const copy = [...prev];
+      let idx = copy.findIndex((p) => p.length === 0);
+      if (idx === -1) {
+        idx = copy.length;
+        copy.push([]);
+        setCantidadDeCajas((p) => p + 1);
+        setMostrarTitulos((p) => [...p, true]);
+      }
+      // insert products into the chosen box
+      copy[idx] = products.map((p) => ({ ...p }));
+      return copy;
+    });
+  };
+
+  const restoreProductsToIndex = (index: number, products: (Product & { quantity: number })[]) => {
+    if (index < 0) return;
+    setProductosPorCaja((prev) => {
+      const copy = [...prev];
+      // ensure array length
+      while (copy.length <= index) copy.push([]);
+      copy[index] = products.map((p) => ({ ...p }));
+      return copy;
+    });
+    setCantidadDeCajas((p) => (p <= index ? index + 1 : p));
+    setMostrarTitulos((p) => {
+      const copy = [...p];
+      while (copy.length <= index) copy.push(true);
+      return copy;
+    });
+  };
+
   const eliminarCaja = (index: number) => {
     if (cantidadDeCajas === 1) return;
     setCantidadDeCajas((p) => p - 1);
@@ -125,6 +182,10 @@ export function usePackingManager(initial = 1) {
 
     aumentarCajas,
     eliminarCaja,
+    resetBox,
+    restoreProductsToFirstEmptyBox,
+    restoreProductsToIndex,
+    ensureBoxes,
 
     addToBox, // firma flexible: (boxId, product|id, amount)
     decrementOne,

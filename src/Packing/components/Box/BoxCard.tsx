@@ -28,6 +28,7 @@ interface Props {
   productos: Product[];
   decrementOne: (boxId: number, prodId: number) => void;
   removeProduct: (boxId: number, prodId: number) => void;
+  onMarkBoxReady?: (boxId: number, productos: Product[]) => void;
 }
 
 export default function BoxCard({
@@ -37,6 +38,7 @@ export default function BoxCard({
   productos,
   decrementOne,
   removeProduct,
+  onMarkBoxReady,
 }: Props) {
   const [hoverMode, setHoverMode] = useState(false);
 
@@ -134,6 +136,9 @@ export default function BoxCard({
   <IconButton
     size="medium"
     disabled={!hasProducts}
+    onClick={() => {
+      onMarkBoxReady?.(boxId, productos);
+    }}
     sx={{
       bgcolor: hasProducts ? "#152c48" : "#e0e0e0",
       color: "white",

@@ -15,6 +15,10 @@ export function usePackingService() {
     decrementOne,
     removeProduct,
     cantidadDeCajas,
+    resetBox,
+    restoreProductsToFirstEmptyBox,
+    restoreProductsToIndex,
+    ensureBoxes,
   } = usePackingManager();
   const {
     isOpen: isQuantityModalOpen,
@@ -73,10 +77,17 @@ export function usePackingService() {
 
     const productId = typeof product === "number" ? product : product.id;
 
-    // 🔹 Calcular cuántas cajas faltan y agregarlas
-    const missingBoxes = boxesCount - cantidadDeCajas;
-    for (let i = 0; i < missingBoxes; i++) {
-      aumentarCajas();
+    // 🔹 Asegurar que existan suficientes cajas (hacerlo en una sola operación)
+    // Esto evita inconsistencias por actualizaciones de estado asíncronas cuando creamos muchas cajas.
+    // `ensureBoxes` garantiza la longitud de `productosPorCaja` y los títulos.
+    if (typeof (ensureBoxes as any) === "function") {
+      // preferir ensureBoxes si está disponible (se expone desde usePackingManager)
+      (ensureBoxes as any)(boxesCount);
+    } else {
+      const missingBoxes = boxesCount - cantidadDeCajas;
+      for (let i = 0; i < missingBoxes; i++) {
+        aumentarCajas();
+      }
     }
 
     // 🔹 IDs de las cajas donde se asignará el producto
@@ -149,6 +160,10 @@ export function usePackingService() {
     mostrarTitulos,
     eliminarCaja,
     aumentarCajas,
+    resetBox,
+    restoreProductsToFirstEmptyBox,
+    restoreProductsToIndex,
+    ensureBoxes,
     handleDragEnd,
     handleRemoveProduct,
     decrementOne: decrementOneFromBox,

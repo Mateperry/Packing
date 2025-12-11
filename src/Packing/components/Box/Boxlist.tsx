@@ -10,6 +10,9 @@ interface Props {
   agregarCaja: () => void;
   decrementOne: (boxId: number, productId: number) => void;
   removeProduct: (boxId: number, productId: number) => void;
+  onMarkBoxReady?: (boxId: number, productos: Product[]) => void;
+  readyBoxIds?: number[];
+  productsCount?: number;
 }
 
 export default function BoxList({
@@ -18,7 +21,12 @@ export default function BoxList({
   agregarCaja,
   decrementOne,
   removeProduct,
+  onMarkBoxReady,
+  readyBoxIds = [],
+  productsCount = 0,
 }: Props) {
+    const visibleBoxes = boxes.filter((box) => !readyBoxIds.includes(box.id));
+
   
   const totalProductos = boxes.reduce(
     (totalItems, box) =>
@@ -26,6 +34,7 @@ export default function BoxList({
       box.productos.reduce((sum, item) => sum + item.quantity, 0),
     0
   );
+  const allBoxesEmpty = boxes.every((b) => b.productos.length === 0);
 
   return (
     <div className="rounded-sm bg-gray-50  overflow-visible">
@@ -36,7 +45,7 @@ export default function BoxList({
         {/*  Totales a la IZQUIERDA */}
         <div className="text-gray-700 text-sm flex gap-6">
           <span>
-            Total de cajas: <strong>{boxes.length}</strong>
+            Total de cajas: <strong>{visibleBoxes.length}</strong>
           </span>
 
           <span>
@@ -50,7 +59,15 @@ export default function BoxList({
   {/* Botón Confirmar Caja */}
   <div className="relative group">
     <button
-      onClick={() => console.log("Confirmar cajas")}
+      onClick={() => {
+        if (visibleBoxes.length > 0) {
+          visibleBoxes.forEach((box) => {
+            if (box.productos.length > 0) {
+              onMarkBoxReady?.(box.id, box.productos);
+            }
+          });
+        }
+      }}
       className="bg-[#152c48] text-white p-3 rounded-full shadow-md hover:bg-[#12303f] 
                  transition flex items-center justify-center"
     >
@@ -63,7 +80,7 @@ export default function BoxList({
                  bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-0 
                  group-hover:opacity-100 transition pointer-events-none shadow"
     >
-      Confirmar cajas
+      Confirmar Todas Las Cajas
     </span>
   </div>
 
@@ -93,24 +110,33 @@ export default function BoxList({
       </div>
 
       {/* GRID DE CAJAS */}
-      <div
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 
+      {productsCount === 0 && allBoxesEmpty ? (
+        <div className="p-8 text-center text-gray-600">
+          <div className="text-2xl">✅</div>
+          <div className="mt-2 font-semibold">Ya empacamos todo</div>
+          <div className="text-sm mt-1 text-gray-500">No hay productos pendientes de empacar.</div>
+        </div>
+      ) : (
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 
         gap-3 overflow-auto 
         max-h-[60vh] sm:max-h-[70vh] md:max-h-[80vh] lg:max-h-[95vh] xl:max-h-[90vh]
         pr-2"
-      >
-        {boxes.map((box, index) => (
-          <BoxCard
-            key={box.id}
-            titulo={`Caja ${index + 1}`}
-            onEliminar={() => eliminarCaja(index)}
-            boxId={box.id}
-            productos={box.productos}
-            decrementOne={decrementOne}
-            removeProduct={removeProduct}
-          />
-        ))}
-      </div>
+        >
+          {visibleBoxes.map((box, index) => (
+            <BoxCard
+              key={box.id}
+              titulo={`Caja ${index + 1}`}
+              onEliminar={() => eliminarCaja(index)}
+              boxId={box.id}
+              productos={box.productos}
+              decrementOne={decrementOne}
+              removeProduct={removeProduct}
+              onMarkBoxReady={onMarkBoxReady}
+            />
+          ))}
+        </div>
+      )}
 
     </div>
   );
