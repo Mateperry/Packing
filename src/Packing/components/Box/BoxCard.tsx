@@ -207,7 +207,7 @@ export default function BoxCard({
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       {!hoverMode ? (
                         <>
-                          <span style={{ fontWeight: 350, fontSize: 12 }}>
+                          <span style={{ fontWeight: 400, fontSize: 12 }}>
                             {prod.description} × {prod.quantity}
                           </span>
                         </>

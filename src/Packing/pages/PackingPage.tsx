@@ -24,7 +24,6 @@ function PackingPage() {
     handleDragEnd,
     handleRemoveProduct,
     decrementOne,
-    assignToBox,
     assignToMultipleBoxes,
     decreaseQuantity,
     isQuantityModalOpen,
@@ -58,11 +57,8 @@ function PackingPage() {
           {/* Lista de productos disponibles */}
           <ProductList
             products={products}
-            boxes={boxes}
-            assignToBox={assignToBox}
             assignToMultipleBoxes={assignToMultipleBoxes}
             decreaseQuantity={decreaseQuantity}
-            
           />
 
           {/* Contenedor de cajas */}

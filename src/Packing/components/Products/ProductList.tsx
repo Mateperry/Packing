@@ -17,9 +17,7 @@ import EyeToggleButton from "../common/EyeToggleButton";
 interface ProductListProps {
   products: Product[];
   usedProductIds?: number[];
-  boxes: { id: number; productos: Product[] }[];
   decreaseQuantity: (id: number, amount: number) => void;
-  assignToBox?: (product: Product | number, boxId: number, amount: number) => void;
   assignToMultipleBoxes?: (
     product: Product | number,
     amountPerBox: number,
@@ -30,9 +28,7 @@ interface ProductListProps {
 function ProductList({
   products,
   usedProductIds = [],
-  boxes,
   decreaseQuantity,
-  assignToBox,
   assignToMultipleBoxes,
 }: ProductListProps) {
   const availableProducts = products.filter(
@@ -114,18 +110,6 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
         isOpen={isModalOpen}
         onClose={closeModal}
         product={selectedProduct}
-        boxes={boxes}
-        onAssignToOneBox={(boxId: number, amount: number) => {
-          if (!selectedProduct) return;
-
-          if (assignToBox) {
-            assignToBox(selectedProduct, boxId, amount);
-          } else {
-            decreaseQuantity(selectedProduct.id, amount);
-          }
-
-          closeModal();
-        }}
         onAssignToMultipleBoxes={(amountPerBox: number, numberOfBoxes: number) => {
           if (!selectedProduct) return;
 
