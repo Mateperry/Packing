@@ -11,6 +11,7 @@ import {
 import ProductList from "../components/Products/ProductList";
 import BoxList from "../components/Box/Boxlist";
 import HomeButtons from "../components/common/HomeButtons";
+import DragQuantityModal from "../components/UI/DragQuantityModal";
 import { usePackingService } from "../Hooks/usePackingService";
 
 function PackingPage() {
@@ -26,6 +27,13 @@ function PackingPage() {
     assignToBox,
     assignToMultipleBoxes,
     decreaseQuantity,
+    isQuantityModalOpen,
+    quantityModalProduct,
+    quantityModalBoxId,
+    quantityModalQuantity,
+    closeQuantityModal,
+    updateQuantityModalQuantity,
+    handleConfirmDragQuantity,
   } = usePackingService();
 
   const sensors = useSensors(
@@ -40,7 +48,7 @@ function PackingPage() {
     <div className="p-3 bg-white rounded-xl shadow-lg max-w-full mx-auto mb-5 my-scroll">
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="flex flex-col items-center mb-6 gap-6">
-          <h2 className="bg-green-600 text-white text-center py-3 px-6 rounded-full text-lg font-sans w-full">
+          <h2 className="bg-[#80ac22] text-[#fff] text-center py-3 px-6 rounded-full text-lg font-sans w-full">
             DISTRIBUCIÓN DE PRODUCTOS
           </h2>
           <HomeButtons />
@@ -70,6 +78,24 @@ function PackingPage() {
           </div>
         </div>
       </DndContext>
+
+      {/* Modal de cantidad para drag & drop */}
+      <DragQuantityModal
+        isOpen={isQuantityModalOpen}
+        product={quantityModalProduct}
+        quantity={quantityModalQuantity}
+        onQuantityChange={updateQuantityModalQuantity}
+        onConfirm={() => {
+          if (quantityModalProduct && quantityModalBoxId !== null) {
+            handleConfirmDragQuantity(
+              quantityModalProduct,
+              quantityModalBoxId,
+              quantityModalQuantity
+            );
+          }
+        }}
+        onCancel={closeQuantityModal}
+      />
     </div>
   );
 }

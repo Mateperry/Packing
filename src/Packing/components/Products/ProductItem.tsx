@@ -11,12 +11,12 @@ interface Props {
 }
 
 function ProductItem({ product, showDescription, onOpenAssign, descriptionTruncated }: Props) {
-  const [color, setColor] = useState(product.color || "#111111");
+  const [color, setColor] = useState(product.color || "#152c48");
 
   useEffect(() => {
-    if (product.quantity >= 100 && product.color !== "#10B981") {
-      product.color = "#10B981";
-      setColor("#10B981");
+    if (product.quantity >= 100 && product.color !== "#80ac22") {
+      product.color = "#80ac22";
+      setColor("#80ac22");
     }
   }, [product.quantity]);
 
@@ -27,12 +27,29 @@ function ProductItem({ product, showDescription, onOpenAssign, descriptionTrunca
       <div className="text-lg font-bold">{product.quantity}</div>
 
       {/* Ícono con color */}
-      <div
-        className="w-12 h-12 rounded-md flex items-center justify-center text-white text-xl"
-        style={{ backgroundColor: color }}
-      >
-        <LocalMallOutlinedIcon />
-      </div>
+<div
+  className="
+    w-12 h-12 rounded-xl flex items-center justify-center text-xl 
+    transition-all duration-200
+    hover:shadow-lg hover:scale-105
+  "
+  style={{
+    border: `2px solid ${color}`,
+    backgroundColor: `${color}15`, // fondo muy sutil
+  }}
+>
+  <LocalMallOutlinedIcon
+    sx={{
+      color,
+      transition: "0.2s",
+      "&:hover": {
+        filter: "brightness(1.2)",
+      },
+    }}
+  />
+</div>
+
+
 
       {/* Texto principal:
           - si showDescription === true => mostramos descripción TRUNCADA (20 chars)
@@ -48,7 +65,7 @@ function ProductItem({ product, showDescription, onOpenAssign, descriptionTrunca
       {/* Botón asignar (no-drag) */}
       {product.quantity > 5 && (
         <button
-          className="absolute top-3 right-3 p-3 bg-green-200 rounded-full shadow-md hover:bg-green-300 active:scale-95 transition no-drag"
+          className="absolute top-3 right-3 p-3 bg-[#80ac22] rounded-full shadow-md hover:bg-[#6b8a1a] active:scale-95 transition no-drag"
           onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
           onClick={(e) => {
             e.stopPropagation();
@@ -56,7 +73,7 @@ function ProductItem({ product, showDescription, onOpenAssign, descriptionTrunca
             onOpenAssign?.();
           }}
         >
-          <Inventory2OutlinedIcon className="text-green-700" fontSize="medium" />
+          <Inventory2OutlinedIcon className="text-[#fff]" fontSize="medium" />
         </button>
       )}
 

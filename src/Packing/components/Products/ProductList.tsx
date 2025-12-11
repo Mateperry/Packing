@@ -87,7 +87,7 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
       </div>
 
       {/* Lista filtrada + paginada */}
-      <div className="flex flex-col gap-2 max-h-[80vh] ">
+      <div className="flex flex-col gap-2  ">
         {currentItems.map((p) => (
           <DraggableProduct
             key={p.id}

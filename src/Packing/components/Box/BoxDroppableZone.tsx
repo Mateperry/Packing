@@ -12,7 +12,7 @@ export default function BoxDroppableZone({ boxIndex, children }: Props) {
   });
 
   return (
-    <div ref={setNodeRef} className="min-h-[120px] flex justify-center items-center">
+    <div ref={setNodeRef} className="min-h-[150px] flex justify-center items-center">
       {children}
     </div>
   );

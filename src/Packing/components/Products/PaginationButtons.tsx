@@ -26,7 +26,7 @@ export default function PaginationButtons({
           transition
           ${page === 1 
             ? "bg-gray-200 text-gray-400 cursor-not-allowed" 
-            : "bg-green-500 text-white hover:bg-green-600"}
+            : "bg-[#80ac22] text-white hover:bg-[#6b8a1a]"}
         `}
       >
         <ArrowBackIosNewIcon fontSize="small" />
@@ -46,7 +46,7 @@ export default function PaginationButtons({
           transition
           ${page === totalPages
             ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-green-500 text-white hover:bg-green-600"}
+            : "bg-[#80ac22] text-white hover:bg-[#6b8a1a]"}
         `}
       >
         <ArrowForwardIosIcon fontSize="small" />

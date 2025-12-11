@@ -1,5 +1,4 @@
-// src/Packing/components/UI/AssignItemsModal.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Modal from "./Modal";
 import type { Product } from "../../interfaces/Product";
 
@@ -7,131 +6,121 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   product: Product | null;
-  boxes: { id: number; productos: Product[] }[];
-  onAssignToOneBox: (boxId: number, amount: number) => void;
-  onAssignToMultipleBoxes: (amountPerBox: number, numberOfBoxes: number) => void;
+  onAssignToMultipleBoxes: (
+    amountPerBox: number,
+    numberOfBoxes: number
+  ) => void;
 }
 
 export default function AssignItemsModal({
   isOpen,
   onClose,
   product,
-  boxes,
-  onAssignToOneBox,
   onAssignToMultipleBoxes,
 }: Props) {
   if (!product) return null;
 
-  const [mode, setMode] = useState<"one" | "multiple">("one");
-  const [selectedBox, setSelectedBox] = useState<number>(boxes[0]?.id ?? 0);
-  const [amountPerBox, setAmountPerBox] = useState(1);
-  const [numberOfBoxes, setNumberOfBoxes] = useState(1);
+  const [amountPerBox, setAmountPerBox] = useState<number | "">("");
+  const [numberOfBoxes, setNumberOfBoxes] = useState<number | "">("");
 
-  const totalAvailable = product.quantity;
-  const totalDistributed = amountPerBox * numberOfBoxes;
-  const isInvalid = totalDistributed > totalAvailable;
+  const totalAvailable =
+    typeof amountPerBox === "number" && typeof numberOfBoxes === "number"
+      ? amountPerBox * numberOfBoxes
+      : 0;
+
+  const isInvalid =
+    totalAvailable > product.quantity ||
+    (amountPerBox !== "" && amountPerBox < 1) ||
+    (numberOfBoxes !== "" && numberOfBoxes < 1);
+
+  // Reset cuando cambia de producto
+  useEffect(() => {
+    setAmountPerBox("");
+    setNumberOfBoxes("");
+  }, [product]);
+
+  // Validaciones: no negativos, no cero, inputs libres
+  const handleAmountChange = (value: string) => {
+    const num = Number(value);
+    if (value === "") return setAmountPerBox("");
+    if (isNaN(num) || num < 1) return setAmountPerBox(1);
+    setAmountPerBox(num);
+  };
+
+  const handleNumberChange = (value: string) => {
+    const num = Number(value);
+    if (value === "") return setNumberOfBoxes("");
+    if (isNaN(num) || num < 1) return setNumberOfBoxes(1);
+    setNumberOfBoxes(num);
+  };
+
+  const handleAssign = () => {
+    if (amountPerBox === "" || numberOfBoxes === "") return;
+    onAssignToMultipleBoxes(amountPerBox as number, numberOfBoxes as number);
+    onClose();
+  };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <h2 className="text-xl font-semibold mb-4 text-center">
-        Asignar unidades de: {product.name}
-      </h2>
+<h2 className="text-sm font-semibold mb-3 text-center text-gray-800">
+  Repartir unidades de:<br />
+  <span className="text-[#152c48]  text-base">
+    {product.description}
+  </span>
+</h2>
 
-      <p className="text-center mb-4">
+      <p className="text-center mb-4 text-gray-700">
         Unidades disponibles: <strong>{product.quantity}</strong>
       </p>
 
-      {/* Selección de modo */}
-      <div className="mb-4">
-        <label className="flex items-center gap-2 mb-2">
+      <div className="space-y-4">
+        {/* Cantidad por caja */}
+        <label className="block text-gray-700 font-medium">
+          Cantidad por caja
           <input
-            type="radio"
-            checked={mode === "one"}
-            onChange={() => setMode("one")}
+            type="number"
+            placeholder="Ingrese cantidad"
+            value={amountPerBox}
+            onChange={(e) => handleAmountChange(e.target.value)}
+            className="mt-2 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6b8a1a] placeholder-gray-400 text-center border-[#80ac22]"
+            min={1}
           />
-          <span>Enviar todo a UNA caja</span>
         </label>
 
-        <label className="flex items-center gap-2 mb-2">
+        {/* Número de cajas */}
+        <label className="block text-gray-700 font-medium">
+          Número de cajas
           <input
-            type="radio"
-            checked={mode === "multiple"}
-            onChange={() => setMode("multiple")}
+            type="number"
+            placeholder="Ingrese cantidad"
+            value={numberOfBoxes}
+            onChange={(e) => handleNumberChange(e.target.value)}
+            className="mt-2 w-full p-3 border border-[#80ac22] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6b8a1a] placeholder-gray-400 text-center"
+            min={1}
           />
-          <span>Repartir en VARIAS cajas</span>
         </label>
+
+        {/* Mensaje de error */}
+        {isInvalid && (
+          <p className="text-red-600 text-sm text-center">
+            La distribución excede las unidades disponibles.
+          </p>
+        )}
+
+        {/* Botón Asignar */}
+        <button
+          className={`w-full py-3 rounded-lg font-medium transition text-white shadow-md
+            ${
+              isInvalid || amountPerBox === "" || numberOfBoxes === ""
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#80ac22] hover:bg-[#6b8a1a]"
+            }`}
+          disabled={isInvalid || amountPerBox === "" || numberOfBoxes === ""}
+          onClick={handleAssign}
+        >
+          Repartir en cajas
+        </button>
       </div>
-
-      {/* Modo UNA caja */}
-      {mode === "one" && (
-        <div className="space-y-4">
-          <label className="block">
-            Seleccionar caja:
-            <select
-              className="w-full mt-2 border rounded p-2"
-              value={selectedBox}
-              onChange={(e) => setSelectedBox(Number(e.target.value))}
-            >
-              {boxes.map((b) => (
-                <option key={b.id} value={b.id}>
-                  Caja #{b.id + 1}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <button
-            className="w-full bg-blue-600 text-white rounded py-2 mt-3"
-            onClick={() => onAssignToOneBox(selectedBox, product.quantity)}
-          >
-            Asignar a caja
-          </button>
-        </div>
-      )}
-
-      {/* Modo VARIAS cajas */}
-      {mode === "multiple" && (
-        <div className="space-y-4">
-          <label className="block">
-            Cantidad por caja:
-            <input
-              type="number"
-              className="w-full mt-2 border rounded p-2"
-              min={1}
-              value={amountPerBox}
-              onChange={(e) => setAmountPerBox(Number(e.target.value))}
-            />
-          </label>
-
-          <label className="block">
-            Número de cajas:
-            <input
-              type="number"
-              min={1}
-              className="w-full mt-2 border rounded p-2"
-              value={numberOfBoxes}
-              onChange={(e) => setNumberOfBoxes(Number(e.target.value))}
-            />
-          </label>
-
-          {isInvalid && (
-            <p className="text-red-600 text-sm">
-              No puedes distribuir más de lo disponible.
-            </p>
-          )}
-
-          <button
-            className="w-full bg-blue-600 text-white rounded py-2 mt-3 disabled:bg-gray-400"
-            disabled={isInvalid}
-            onClick={() => {
-              onAssignToMultipleBoxes(amountPerBox, numberOfBoxes);
-              onClose();
-            }}
-          >
-            Repartir en cajas
-          </button>
-        </div>
-      )}
     </Modal>
   );
 }

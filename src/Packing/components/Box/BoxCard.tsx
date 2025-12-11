@@ -14,6 +14,7 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import CategoryIcon from "@mui/icons-material/Category";
+import CheckIcon from '@mui/icons-material/Check';
 
 import DroppableBox from "../Box/DroppableBox";
 import BoxContend from "./BoxContend";
@@ -42,8 +43,9 @@ export default function BoxCard({
   // === POSICIÓN TOOLTIP ===
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
   const [tooltipText, setTooltipText] = useState("");
+  const [isHovering, setIsHovering] = useState(false);
 
-  const handleShowTooltip = (
+  const handleEnter = (
     e: React.MouseEvent<HTMLDivElement>,
     text: string
   ) => {
@@ -53,12 +55,15 @@ export default function BoxCard({
       left: rect.left + rect.width / 2,
     });
     setTooltipText(text);
+    setIsHovering(true);
+  };
+
+  const handleLeave = () => {
+    setIsHovering(false);
+    setTooltipText("");
   };
 
   const hasProducts = productos.length > 0;
-
-  const truncate = (str: string) =>
-    str.length > 20 ? str.slice(0, 20) + "..." : str;
 
   return (
     <>
@@ -76,26 +81,83 @@ export default function BoxCard({
         <CardHeader
           title={titulo}
           action={
-            <Box sx={{ display: "flex", gap: 1 }}>
-              {/* OJO (solo cambia la vista del texto, no afecta hover) */}
-              <IconButton size="medium" onClick={() => setHoverMode(!hoverMode)}>
-                {hoverMode ? (
-                  <VisibilityOffOutlinedIcon sx={{ fontSize: 20 }} />
-                ) : (
-                  <VisibilityOutlinedIcon sx={{ fontSize: 20 }} />
-                )}
-              </IconButton>
+<Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
 
-              <IconButton size="medium" onClick={onEliminar} disabled={hasProducts}>
-                <DeleteOutlineIcon
-                  sx={{
-                    fontSize: 18,
-                    color: hasProducts ? "gray" : "red",
-                    cursor: hasProducts ? "not-allowed" : "pointer",
-                  }}
-                />
-              </IconButton>
-            </Box>
+  {/* OJO (mostrar / ocultar descripción) */}
+  <IconButton
+    size="medium"
+    onClick={() => {
+      setHoverMode(!hoverMode);
+      handleLeave();
+    }}
+    sx={{
+      bgcolor: "white",
+      border: "1px solid #e0e0e0",
+      "&:hover": {
+        bgcolor: "#f3f3f3",
+      },
+    }}
+  >
+    {hoverMode ? (
+      <VisibilityOffOutlinedIcon sx={{ fontSize: 20 }} />
+    ) : (
+      <VisibilityOutlinedIcon sx={{ fontSize: 20 }} />
+    )}
+  </IconButton>
+
+  {/* ELIMINAR CAJA */}
+  <IconButton
+    size="medium"
+    onClick={() => {
+      handleLeave();
+      onEliminar();
+    }}
+    disabled={hasProducts}
+    sx={{
+      bgcolor: "white",
+      border: "1px solid #e0e0e0",
+      "&:hover": {
+        bgcolor: hasProducts ? "white" : "#ffe5e5",
+      },
+    }}
+  >
+    <DeleteOutlineIcon
+      sx={{
+        fontSize: 18,
+        color: hasProducts ? "#bdbdbd" : "red",
+        transition: "0.2s",
+      }}
+    />
+  </IconButton>
+
+  {/* CONFIRMAR CAJA */}
+  <IconButton
+    size="medium"
+    disabled={!hasProducts}
+    sx={{
+      bgcolor: hasProducts ? "#152c48" : "#e0e0e0",
+      color: "white",
+      borderRadius: "50%",
+      width: 36,
+      height: 36,
+      transition: "0.3s",
+      boxShadow: hasProducts ? "0 2px 6px rgba(21, 44, 72, 0.3)" : "none",
+      "&:hover": {
+        bgcolor: hasProducts ? "#12303f" : "#e0e0e0",
+        cursor: hasProducts ? "pointer" : "not-allowed",
+      },
+    }}
+  >
+    <CheckIcon
+      sx={{
+        fontSize: 20,
+        color: hasProducts ? "white" : "#152c48",
+      }}
+    />
+  </IconButton>
+
+</Box>
+
           }
           sx={{
             px: 2,
@@ -115,43 +177,38 @@ export default function BoxCard({
                   key={prod.id}
                   className="group relative"
                   sx={{
-                    p: "8px 12px",
-                    borderRadius: "10px",
+                    p: "2px 10px",
+                    borderRadius: "12px",
                     backgroundColor: "#F9FAFB",
                     border: "1px solid #E5E7EB",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
-                    gap: 2,
+                    gap: 1,
                   }}
-                  onMouseEnter={(e) => handleShowTooltip(e, prod.description)} // ← SIEMPRE ACTIVO
-                  onMouseLeave={() => setTooltipText("")}
+                  onMouseEnter={(e) => handleEnter(e, prod.description)}
+                  onMouseLeave={handleLeave}
                 >
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Box
                       sx={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: "6px",
+                        width: 20,
+                        height: 20,
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
-                        color: "white",
-                        backgroundColor: prod.color || "#000000",
+                        color: prod.color || "black",
                       }}
                     >
-                      <CategoryIcon sx={{ fontSize: 16 }} />
+                      <CategoryIcon sx={{ fontSize: 18 }} />
                     </Box>
 
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       {!hoverMode ? (
                         <>
-                          <span style={{ fontWeight: 450 }}>
-                            {truncate(prod.description)}
-                          </span>
-                          <span style={{ fontSize: 12, color: "#4B5563" }}>
-                            {prod.name} × {prod.quantity}
+                          <span style={{ fontWeight: 350, fontSize: 12 }}>
+                            {prod.description} × {prod.quantity}
                           </span>
                         </>
                       ) : (
@@ -165,7 +222,10 @@ export default function BoxCard({
                   <Box sx={{ display: "flex", gap: 1 }}>
                     {prod.quantity >= 2 && (
                       <button
-                        onClick={() => decrementOne(boxId, prod.id)}
+                        onClick={() => {
+                          handleLeave(); // limpia tooltip antes de cambiar cantidad
+                          decrementOne(boxId, prod.id);
+                        }}
                         className="py-1 transition text-sm"
                       >
                         <RemoveCircleIcon sx={{ fontSize: 22 }} />
@@ -173,7 +233,10 @@ export default function BoxCard({
                     )}
 
                     <button
-                      onClick={() => removeProduct(boxId, prod.id)}
+                      onClick={() => {
+                        handleLeave(); // limpia tooltip antes de remover
+                        removeProduct(boxId, prod.id);
+                      }}
                       className="py-1 text-red-500 transition text-sm"
                     >
                       <CancelIcon sx={{ fontSize: 22 }} />
@@ -186,8 +249,9 @@ export default function BoxCard({
         </DroppableBox>
       </Card>
 
-      {/* TOOLTIP SIEMPRE ACTIVO */}
-      {tooltipText &&
+      {/* TOOLTIP: sólo renderiza mientras realmente hay hover */}
+      {isHovering &&
+        tooltipText &&
         createPortal(
           <div
             style={{
@@ -201,7 +265,7 @@ export default function BoxCard({
               borderRadius: "8px",
               fontSize: "12px",
               zIndex: 9999,
-              maxWidth: "380px",
+              maxWidth: "400px",
               wordBreak: "break-word",
               boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
             }}

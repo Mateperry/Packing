@@ -2,6 +2,7 @@
 import type { Product } from "../interfaces/Product";
 import { useProducts } from "./useProducts";
 import { usePackingManager } from "./usePackingManager";
+import { useQuantityModal } from "./useQuantityModal";
 
 export function usePackingService() {
   const { products, decreaseQuantity, increaseQuantity } = useProducts();
@@ -15,6 +16,15 @@ export function usePackingService() {
     removeProduct,
     cantidadDeCajas,
   } = usePackingManager();
+  const {
+    isOpen: isQuantityModalOpen,
+    selectedProduct: quantityModalProduct,
+    selectedBox: quantityModalBoxId,
+    quantity: quantityModalQuantity,
+    openModal: openQuantityModal,
+    closeModal: closeQuantityModal,
+    updateQuantity: updateQuantityModalQuantity,
+  } = useQuantityModal();
 
   // IDs de productos que ya están en cajas
   const usedProductIds = boxes.flatMap((b) => b.productos.map((p) => p.id));
@@ -93,9 +103,22 @@ export function usePackingService() {
     );
 
     if (isProduct && product && boxId !== undefined) {
-      addToBox(boxId, product, 1);
-      decreaseQuantity(product.id, 1);
+      // Si el producto tiene más de 5 items, abrir modal
+      if (product.quantity > 5) {
+        openQuantityModal(product, boxId);
+      } else {
+        // Si no, agregar 1 directamente
+        addToBox(boxId, product, 1);
+        decreaseQuantity(product.id, 1);
+      }
     }
+  };
+
+  // Confirmar cantidad desde modal de drag
+  const handleConfirmDragQuantity = (product: Product, boxId: number, quantity: number) => {
+    addToBox(boxId, product, quantity);
+    decreaseQuantity(product.id, quantity);
+    closeQuantityModal();
   };
 
   // Eliminar un producto de una caja
@@ -133,5 +156,13 @@ export function usePackingService() {
     assignToMultipleBoxes,
     cantidadDeCajas,
     decreaseQuantity,
+    isQuantityModalOpen,
+    quantityModalProduct,
+    quantityModalBoxId,
+    quantityModalQuantity,
+    openQuantityModal,
+    closeQuantityModal,
+    updateQuantityModalQuantity,
+    handleConfirmDragQuantity,
   };
 }

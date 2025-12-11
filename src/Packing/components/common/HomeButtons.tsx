@@ -15,7 +15,7 @@ function HomeButtons () {
          Cancelar proceso
       </button>
 
-      <button className="flex items-center gap-2 bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition"
+      <button className="flex items-center gap-2 bg-[#80ac22] text-white px-6 py-2 rounded-full hover:bg-[#6b8a1a] transition"
       onClick={()=> alert("El boton de proceso Finalizado fue tocado")}
       >
         <CheckIcon />

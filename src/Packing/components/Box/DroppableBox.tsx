@@ -17,8 +17,8 @@ export default function DroppableBox({ boxId, children }: Props) {
       className="
         text-sm sm:text-xs md:text-xs lg:text-sm
         rounded-xl
-        min-h-[140px]
-        max-h-[250px]
+        min-h-[150px]
+        max-h-[200px]
         p-1
         overflow-y-auto
       "
