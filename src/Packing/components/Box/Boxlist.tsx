@@ -3,6 +3,7 @@ import type { Product } from "../../interfaces/Product";
 import BoxCard from "./BoxCard";
 import CheckIcon from '@mui/icons-material/Check';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 interface Props {
   boxes: { id: number; productos: Product[] }[];
   mostrarTitulos: boolean[];
@@ -112,7 +113,7 @@ export default function BoxList({
       {/* GRID DE CAJAS */}
       {productsCount === 0 && allBoxesEmpty ? (
         <div className="p-8 text-center text-gray-600">
-          <div className="text-2xl">✅</div>
+          <div className="text-2xl"><AssignmentTurnedInIcon className="text-[#152c48]" /></div>
           <div className="mt-2 font-semibold">Ya empacamos todo</div>
           <div className="text-sm mt-1 text-gray-500">No hay productos pendientes de empacar.</div>
         </div>
@@ -120,7 +121,7 @@ export default function BoxList({
         <div
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 
         gap-3 overflow-auto 
-        max-h-[60vh] sm:max-h-[70vh] md:max-h-[80vh] lg:max-h-[95vh] xl:max-h-[90vh]
+        max-h-[99vh] sm:max-h-[90vh] md:max-h-[90vh] lg:max-h-[95vh] xl:max-h-[105vh]
         pr-2"
         >
           {visibleBoxes.map((box, index) => (

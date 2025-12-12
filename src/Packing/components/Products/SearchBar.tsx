@@ -9,7 +9,7 @@ export default function SearchBar({ value, onChange }: SearchBarProps) {
   return (
     <div
       className="
-        flex items-center gap-2 bg-white border border-[#80ac22] rounded-full 
+        flex items-center gap-2 bg-white border border-[#152c48] rounded-full 
         shadow-sm 
         px-2 py-1       /* Mobile */
         sm:px-3 sm:py-2 /* Tablets */

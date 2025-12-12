@@ -82,7 +82,7 @@ export default function AssignItemsModal({
             placeholder="Ingrese cantidad"
             value={amountPerBox}
             onChange={(e) => handleAmountChange(e.target.value)}
-            className="mt-2 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6b8a1a] placeholder-gray-400 text-center border-[#80ac22]"
+            className="mt-2 w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#152c48] placeholder-gray-400 text-center border-[#152c48]"
             min={1}
           />
         </label>
@@ -95,7 +95,7 @@ export default function AssignItemsModal({
             placeholder="Ingrese cantidad"
             value={numberOfBoxes}
             onChange={(e) => handleNumberChange(e.target.value)}
-            className="mt-2 w-full p-3 border border-[#80ac22] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6b8a1a] placeholder-gray-400 text-center"
+            className="mt-2 w-full p-3 border border-[#152c48] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#152c48] placeholder-gray-400 text-center"
             min={1}
           />
         </label>
@@ -113,7 +113,7 @@ export default function AssignItemsModal({
             ${
               isInvalid || amountPerBox === "" || numberOfBoxes === ""
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-[#80ac22] hover:bg-[#6b8a1a]"
+                : "bg-[#152c48] hover:bg-[#123140]"
             }`}
           disabled={isInvalid || amountPerBox === "" || numberOfBoxes === ""}
           onClick={handleAssign}

@@ -31,11 +31,11 @@
 
 /* Barra que se mueve */
 ::-webkit-scrollbar-thumb {
-  background: #80ac22;  /* tu verde */
+  background: #152c48;  /* tu verde */
   border-radius: 100px;
 }
 
 /* Hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #6b8a1a;  /* verde un poco más oscuro */
+  background: #152c48;  /* verde un poco más oscuro */
 }

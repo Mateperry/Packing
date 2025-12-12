@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -11,83 +11,87 @@ import type { ReadyBox } from "../../Hooks/useBoxShipping";
 interface Props {
   readyBoxes: ReadyBox[];
   onRestore?: (readyBoxId: number) => void;
+  isOpen?: boolean;
+  onClose?: () => void;
 }
 
 const PRIMARY = "#152c48";
 
-export default function ReadyBoxesPanel({ readyBoxes, onRestore }: Props) {
-  const [isOpen, setIsOpen] = useState(false);
+export default function ReadyBoxesPanel({ readyBoxes, onRestore, isOpen = false, onClose }: Props) {
+
+  //  BLOQUEAR SCROLL DEL BODY CUANDO EL PANEL ESTÁ ABIERTO
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
+
+
 
   if (readyBoxes.length === 0) return null;
 
-  return (
-    <Box
-      sx={{
-        position: "fixed",
-        top: 90,
-        right: 10,
-        zIndex: 1000,
-        display: "flex",
-        alignItems: "flex-start",
-        gap: 0,
-      }}
-    >
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <Box
-            onClick={() => setIsOpen(false)}
-            sx={{
-              position: "fixed",
-              inset: 0,
-              backgroundColor: "rgba(0,0,0,0.25)",
-              backdropFilter: "blur(6px)",
-              WebkitBackdropFilter: "blur(6px)",
-              zIndex: 1000,
-            }}
-          />
+  if (!isOpen) return null;
 
-          {/* Fullscreen panel */}
-          <Card
-            sx={{
-              position: "fixed",
-              top: 0,
-              right: 0,
-              width: { xs: "100%", sm: "70%", md: "50%", lg: "40%" },
-              maxWidth: 500,
-              height: "100vh",
-              zIndex: 1100,
-              backgroundColor: "#fafafa",
-              boxShadow: "0 8px 40px rgba(0,0,0,0.25)",
-              borderRadius: "12px 0 0 12px",
-              overflow: "auto",
-              display: "flex",
-              flexDirection: "column",
-              animation: "slideIn 0.25s ease-out",
-            }}
-          >
+  return (
+    <>
+      {/* Backdrop */}
+      <Box
+        onClick={() => onClose?.()}
+        sx={{
+          position: "fixed",
+          inset: 0,
+          backgroundColor: "rgba(0,0,0,0.2)",
+          backdropFilter: "blur(4px)",
+          zIndex: 1000,
+        }}
+      />
+
+      {/* PANEL */}
+      <Card
+        sx={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          width: { xs: "100%", sm: "65%", md: "45%", lg: "38%" },
+          maxWidth: 440,
+          height: "100vh",
+          zIndex: 1100,
+          backgroundColor: "#ffffff",
+          borderRadius: "12px 0 0 12px",
+          boxShadow: "0 6px 30px rgba(0,0,0,0.18)",
+          overflow: "auto",
+          animation: "slideIn 0.25s ease-out",
+        }}
+      >
             {/* HEADER */}
             <Box
               sx={{
-                background: "linear-gradient(90deg, #80ac22, #6a8c1d)",
+                background: PRIMARY,
                 color: "white",
-                padding: "16px",
-                fontWeight: 700,
-                fontSize: 16,
+                padding: "14px 18px",
+                fontWeight: 600,
+                fontSize: 15,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                borderRadius: "12px 0 0 0",
               }}
             >
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <span style={{ fontSize: 18 }}>Cajas Listas</span>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <span style={{ fontSize: 17 }}>Cajas Listas</span>
+
                 <span
                   style={{
                     backgroundColor: "rgba(255,255,255,0.25)",
                     borderRadius: 6,
-                    padding: "4px 10px",
-                    fontSize: 13,
+                    padding: "2px 8px",
+                    fontSize: 12,
                     fontWeight: 700,
                   }}
                 >
@@ -95,101 +99,89 @@ export default function ReadyBoxesPanel({ readyBoxes, onRestore }: Props) {
                 </span>
               </Box>
 
-              <IconButton size="large" onClick={() => setIsOpen(false)} sx={{ color: "white" }}>
-                <ChevronRightIcon />
+              <IconButton
+                size="small"
+                onClick={() => onClose?.()}
+                sx={{ color: "white" }}
+              >
+                <ChevronRightIcon fontSize="small" />
               </IconButton>
             </Box>
 
             {/* CONTENT */}
-            <CardContent sx={{ padding: 3 }}>
-              {readyBoxes.map((box, index) => {
-                const totalItems = box.productos.reduce((s, p) => s + (p.quantity || 0), 0);
+            <CardContent sx={{ padding: "16px 18px" }}>
+              {readyBoxes.map((box, index) => (
+                <Box
+                  key={box.id}
+                  sx={{
+                    mb: 1.5,
+                    background: "white",
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: "1px solid #e6e6e6",
+                    boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+                    transition: "0.2s",
+                    "&:hover": {
+                      boxShadow: "0 3px 10px rgba(0,0,0,0.13)",
+                      transform: "translateY(-2px)",
+                    },
+                  }}
+                >
+                  {index > 0 && <Divider sx={{ my: 1 }} />}
 
-                return (
-                  <Box
-                    key={box.id}
-                    sx={{
-                      mb: 2,
-                      background: "white",
-                      p: 2,
-                      borderRadius: 2,
-                      border: "1px solid #e4e4e4",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                      transition: "0.2s",
-                      "&:hover": {
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                        transform: "translateY(-2px)",
-                      },
-                    }}
-                  >
-                    {index > 0 && <Divider sx={{ my: 1 }} />}
-
-                    <Box sx={{ py: 1 }}>
+                  <Box sx={{ py: 1 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
                       <Box
                         sx={{
                           display: "flex",
+                          gap: 1.5,
                           alignItems: "center",
-                          justifyContent: "space-between",
-                          mb: 1,
                         }}
                       >
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "baseline" }}>
-                          <Box sx={{ fontWeight: 700, fontSize: 16, color: PRIMARY }}>
-                            {box.titulo}
-                          </Box>
-                          <Box sx={{ fontSize: 13, color: "#777" }}>{totalItems} items</Box>
+                        <Box
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: 15,
+                            color: PRIMARY,
+                          }}
+                        >
+                          {box.titulo}
                         </Box>
 
-                        {onRestore && (
-                          <IconButton
-                            size="small"
-                            onClick={() => onRestore(box.id)}
-                            sx={{
-                              color: PRIMARY,
-                              backgroundColor: "#eef2f7",
-                              "&:hover": { backgroundColor: "#e0e6ef" },
-                            }}
-                          >
-                            <ChevronLeftIcon />
-                          </IconButton>
-                        )}
+                        <Box sx={{ fontSize: 12, color: "#777" }}>
+                          {box.productos.length} SKU
+                        </Box>
                       </Box>
 
-                      <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                        {box.productos.map((prod) => (
-                          <Box key={prod.id} sx={{ fontSize: 14, color: "#444" }}>
-                            {prod.description} × {prod.quantity}
-                          </Box>
-                        ))}
-                      </Box>
+                      {onRestore && (
+                        <IconButton
+                          size="small"
+                          onClick={() => onRestore(box.id)}
+                          sx={{
+                            color: PRIMARY,
+                            backgroundColor: "#eff3f8",
+                            width: 26,
+                            height: 26,
+                            "&:hover": {
+                              backgroundColor: "#e3e8ef",
+                            },
+                          }}
+                        >
+                          <ChevronLeftIcon fontSize="small" />
+                        </IconButton>
+                      )}
                     </Box>
                   </Box>
-                );
-              })}
+                </Box>
+              ))}
             </CardContent>
           </Card>
-        </>
-      )}
-
-      {/* BOTÓN TOGGLE */}
-      <IconButton
-        onClick={() => setIsOpen(!isOpen)}
-        sx={{
-          backgroundColor: "#80ac22",
-          color: "white",
-          borderRadius: "50%",
-          width: 48,
-          height: 48,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-          "&:hover": {
-            backgroundColor: "#6a8c1d",
-            transform: "scale(1.07)",
-          },
-          transition: "0.25s",
-        }}
-      >
-        {isOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-      </IconButton>
-    </Box>
+    </>
   );
 }

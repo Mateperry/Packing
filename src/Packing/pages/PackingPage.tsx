@@ -8,6 +8,7 @@ import {
   useSensors,    
 } from "@dnd-kit/core";
 
+import { useState } from 'react';
 import ProductList from "../components/Products/ProductList";
 import BoxList from "../components/Box/Boxlist";
 import HomeButtons from "../components/common/HomeButtons";
@@ -41,6 +42,7 @@ function PackingPage() {
   } = usePackingService();
 
   const { readyBoxes, markBoxReady, unmarkBoxReady } = useBoxShipping();
+  const [isReadyBoxesOpen, setIsReadyBoxesOpen] = useState(false);
 
   const handleMarkBoxReady = (boxId: number, productos: any[]) => {
     // create a title based on position (human-friendly)
@@ -83,11 +85,15 @@ function PackingPage() {
   return (
     <div className="p-3 bg-white rounded-xl shadow-lg max-w-full mx-auto mb-5 my-scroll">
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <div className="flex flex-col items-center mb-6 gap-6">
-          <h2 className="bg-[#80ac22] text-[#fff] text-center py-3 px-6 rounded-full text-lg font-sans w-full">
+        <div className="flex flex-col items-center mb-6 gap-6 w-full">
+          <h2 className="bg-[#152c48] text-[#fff] text-center py-3 px-6 rounded-full text-lg font-sans w-full">
             DISTRIBUCIÓN DE PRODUCTOS
           </h2>
-          <HomeButtons />
+          <HomeButtons
+            isReadyBoxesOpen={isReadyBoxesOpen}
+            onToggleReadyBoxes={() => setIsReadyBoxesOpen((s) => !s)}
+            readyBoxesCount={readyBoxes.length}
+          />
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
@@ -120,6 +126,8 @@ function PackingPage() {
       <ReadyBoxesPanel
         readyBoxes={readyBoxes}
         onRestore={handleRestoreReady}
+        isOpen={isReadyBoxesOpen}
+        onClose={() => setIsReadyBoxesOpen(false)}
       />
 
       {/* Modal de cantidad para drag & drop */}

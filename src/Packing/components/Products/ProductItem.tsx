@@ -14,9 +14,9 @@ function ProductItem({ product, showDescription, onOpenAssign, descriptionTrunca
   const [color, setColor] = useState(product.color || "#152c48");
 
   useEffect(() => {
-    if (product.quantity >= 100 && product.color !== "#80ac22") {
-      product.color = "#80ac22";
-      setColor("#80ac22");
+    if (product.quantity >= 100 && product.color !== "#5cc4ed") {
+      product.color = "#5cc4ed";
+      setColor("#5cc4ed");
     }
   }, [product.quantity]);
 
@@ -65,7 +65,7 @@ function ProductItem({ product, showDescription, onOpenAssign, descriptionTrunca
       {/* Botón asignar (no-drag) */}
       {product.quantity > 5 && (
         <button
-          className="absolute top-3 right-3 p-3 bg-[#80ac22] rounded-full shadow-md hover:bg-[#6b8a1a] active:scale-95 transition no-drag"
+          className="absolute top-3 right-3 p-3 bg-[#5cc4ed] rounded-full shadow-md hover:bg-[#5cc4ed] active:scale-95 transition no-drag"
           onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); }}
           onClick={(e) => {
             e.stopPropagation();
