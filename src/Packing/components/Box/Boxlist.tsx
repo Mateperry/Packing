@@ -4,6 +4,9 @@ import BoxCard from "./BoxCard";
 import CheckIcon from '@mui/icons-material/Check';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 interface Props {
   boxes: { id: number; productos: Product[] }[];
   mostrarTitulos: boolean[];
@@ -14,6 +17,9 @@ interface Props {
   onMarkBoxReady?: (boxId: number, productos: Product[]) => void;
   readyBoxIds?: number[];
   productsCount?: number;
+  isReadyBoxesOpen?: boolean;
+  onToggleReadyBoxes?: () => void;
+  readyBoxesCount?: number;
 }
 
 export default function BoxList({
@@ -25,6 +31,9 @@ export default function BoxList({
   onMarkBoxReady,
   readyBoxIds = [],
   productsCount = 0,
+  isReadyBoxesOpen = false,
+  onToggleReadyBoxes,
+  readyBoxesCount = 0,
 }: Props) {
     const visibleBoxes = boxes.filter((box) => !readyBoxIds.includes(box.id));
 
@@ -38,13 +47,13 @@ export default function BoxList({
   const allBoxesEmpty = boxes.every((b) => b.productos.length === 0);
 
   return (
-    <div className="rounded-sm bg-gray-50  overflow-visible">
+    <div className="rounded-sm bg-gray-50  overflow-visible max-h-screen">
 
       {/*  HEADER SUPERIOR (Opción 1 Profesional) */}
-      <div className="flex justify-between items-center px-3 py-3 mb-3 border-b">
+      <div className="flex justify-between items-center px-2 py-2 mb-2 border-b gap-2">
 
         {/*  Totales a la IZQUIERDA */}
-        <div className="text-gray-700 text-sm flex gap-6">
+        <div className="text-gray-700 text-xs flex gap-3">
           <span>
             Total de cajas: <strong>{visibleBoxes.length}</strong>
           </span>
@@ -55,7 +64,7 @@ export default function BoxList({
         </div>
 
         {/* Contenedor para DOS BOTONES a la DERECHA */}
-<div className="flex items-center gap-3">
+<div className="flex items-center gap-2">
 
   {/* Botón Confirmar Caja */}
   <div className="relative group">
@@ -69,41 +78,73 @@ export default function BoxList({
           });
         }
       }}
-      className="bg-[#152c48] text-white p-3 rounded-full shadow-md hover:bg-[#12303f] 
-                 transition flex items-center justify-center"
+      className="bg-[#152c48] text-white p-2 rounded-full shadow-md hover:bg-[#12303f] text-sm transition flex items-center justify-center"
     >
-      <CheckIcon className="text-white" />
+      <CheckIcon className="text-white" fontSize="small" />
     </button>
-
     {/* Tooltip */}
     <span
-      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
-                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-0 
+      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 
+                 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded-md opacity-0 
                  group-hover:opacity-100 transition pointer-events-none shadow"
     >
-      Confirmar Todas Las Cajas
+      Confirmar Todas
     </span>
   </div>
+
 
   {/* Botón Agregar Caja */}
   <div className="relative group">
     <button
       onClick={agregarCaja}
-      className="bg-orange-500 text-white p-3 rounded-full shadow-md hover:bg-orange-600 
-                 transition flex items-center justify-center"
+      className="bg-orange-500 text-white p-2 rounded-full shadow-md hover:bg-orange-600 text-sm transition flex items-center justify-center"
     >
-      <AddCircleIcon className="text-white" />
+      <AddCircleIcon className="text-white" fontSize="small" />
     </button>
-
     {/* Tooltip */}
     <span
-      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 
-                 bg-gray-800 text-white text-xs px-2 py-1 rounded-md opacity-0 
+      className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 
+                 bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded-md opacity-0 
                  group-hover:opacity-100 transition pointer-events-none shadow"
     >
       Agregar caja
     </span>
   </div>
+
+  {/* Botón Cajas Listas (nuevo lugar, con icono original) */}
+  {readyBoxesCount > 0 && (
+    <div className="relative group">
+      <IconButton
+        onClick={onToggleReadyBoxes}
+        size="small"
+        sx={{
+          backgroundColor: '#152c48',
+          color: 'white',
+          width: 32,
+          height: 32,
+          boxShadow: '0 2px 6px rgba(0,0,0,0.18)',
+          '&:hover': {
+            backgroundColor: '#0d2236',
+            transform: 'scale(1.08)'
+          }
+        }}
+        aria-label="Cajas listas"
+      >
+        {isReadyBoxesOpen ? (
+          <ChevronRightIcon fontSize="small" />
+        ) : (
+          <ChevronLeftIcon fontSize="small" />
+        )}
+      </IconButton>
+      <span
+        className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 
+                   bg-gray-800 text-white text-[10px] px-1.5 py-0.5 rounded-md opacity-0 
+                   group-hover:opacity-100 transition pointer-events-none shadow"
+      >
+        Ver listas
+      </span>
+    </div>
+  )}
 
 </div>
 
@@ -119,11 +160,12 @@ export default function BoxList({
         </div>
       ) : (
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 
-        gap-3 overflow-auto 
-        max-h-[99vh] sm:max-h-[90vh] md:max-h-[90vh] lg:max-h-[95vh] xl:max-h-[105vh]
-        pr-2"
-        >
+          
+  className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 
+  gap-3 overflow-y-auto     max-h-[700px] px-3 
+  pr-2"
+>
+
           {visibleBoxes.map((box, index) => (
             <BoxCard
               key={box.id}

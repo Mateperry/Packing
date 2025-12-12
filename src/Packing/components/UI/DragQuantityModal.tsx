@@ -19,10 +19,12 @@ interface Props {
 
 const PRIMARY = "#152c48";
 const PRIMARY_CONTRAST = "#fff";
-const SECONDARY = "#80ac22";
+//const SECONDARY = "#80ac22";
 const SECONDARY_CONTRAST = "#fff";
 const NEUTRAL = "#fefefe";
 const BACKGROUND = "#ffffff";
+
+import { useEffect } from "react";
 
 export default function DragQuantityModal({
   isOpen,
@@ -32,7 +34,16 @@ export default function DragQuantityModal({
   onConfirm,
   onCancel,
 }: Props) {
+  // Si no hay producto, no renderizar nada
   if (!product) return null;
+
+  // Cuando el modal se abre, setear la cantidad máxima permitida
+  useEffect(() => {
+    if (isOpen && product) {
+      onQuantityChange(product.quantity);
+    }
+    // Solo cuando se abre el modal o cambia el producto
+  }, [isOpen, product]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value) || 0;
@@ -48,8 +59,6 @@ export default function DragQuantityModal({
     const newQty = Math.min(product.quantity, quantity + amount);
     onQuantityChange(newQty);
   };
-
-
 
   return (
     <Dialog
@@ -301,9 +310,9 @@ export default function DragQuantityModal({
             textTransform: "none",
             fontWeight: 700,
             borderRadius: "6px",
-            backgroundColor: SECONDARY,
+            backgroundColor:PRIMARY,
             color: SECONDARY_CONTRAST,
-            "&:hover": { backgroundColor: "#6f9420" },
+            "&:hover": { backgroundColor: PRIMARY},
           }}
         >
           Confirmar

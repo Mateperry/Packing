@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -74,9 +73,9 @@ export default function ReadyBoxesPanel({ readyBoxes, onRestore, isOpen = false,
               sx={{
                 background: PRIMARY,
                 color: "white",
-                padding: "14px 18px",
+                padding: "10px 14px",
                 fontWeight: 600,
-                fontSize: 15,
+                fontSize: 14,
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
@@ -84,7 +83,7 @@ export default function ReadyBoxesPanel({ readyBoxes, onRestore, isOpen = false,
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <span style={{ fontSize: 17 }}>Cajas Listas</span>
+                <span style={{ fontSize: 14 }}>Cajas Listas</span>
 
                 <span
                   style={{
@@ -109,14 +108,14 @@ export default function ReadyBoxesPanel({ readyBoxes, onRestore, isOpen = false,
             </Box>
 
             {/* CONTENT */}
-            <CardContent sx={{ padding: "16px 18px" }}>
-              {readyBoxes.map((box, index) => (
+            <CardContent sx={{ padding: "10px 18px" }}>
+              {readyBoxes.map((box) => (
                 <Box
                   key={box.id}
                   sx={{
-                    mb: 1.5,
+                    mb: 1,
                     background: "white",
-                    p: 1.5,
+                    p: 1,
                     borderRadius: 2,
                     border: "1px solid #e6e6e6",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
@@ -127,7 +126,7 @@ export default function ReadyBoxesPanel({ readyBoxes, onRestore, isOpen = false,
                     },
                   }}
                 >
-                  {index > 0 && <Divider sx={{ my: 1 }} />}
+                  
 
                   <Box sx={{ py: 1 }}>
                     <Box

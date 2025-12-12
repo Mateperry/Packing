@@ -67,12 +67,12 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
   // ---------------------------
 
   return (
-    <div className="w-full sm:w-2/12 md:w-3/12 lg:w-1/4 xl:w-1/5 bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-full">
+    <div className="w-full sm:w-2/12 md:w-3/12 lg:w-1/4 xl:w-[19%] bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-full">
       {/* Barra de búsqueda */}
       <SearchBar value={search} onChange={handleSearch} />
 
       {/* Cantidad de ítems */}
-      <div className="bg-gray-200 rounded-xl px-4 py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto relative">
+      <div className="bg-gray-200 rounded-xl  py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto relative">
         <div className="absolute top-1 right-1 bg-transparent">
           <EyeToggleButton active={showDescription} onToggle={toggle} size={15} />
         </div>
