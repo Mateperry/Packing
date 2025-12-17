@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { Product } from "../interfaces/Product";
+import { useRef, useState } from "react";
+import type { Product } from "../../interfaces/Product";
 
 export interface ReadyBox {
   id: number;
@@ -17,27 +17,43 @@ export interface ShippedBox extends ReadyBox {
 export function useBoxShipping() {
   const [readyBoxes, setReadyBoxes] = useState<ReadyBox[]>([]);
   const [shippedBoxes, setShippedBoxes] = useState<ShippedBox[]>([]);
-  const [nextId, setNextId] = useState(1);
 
-  const markBoxReady = (box: Omit<ReadyBox, "id" | "readyAt"> & { sourceIndex?: number }) => {
+  const nextIdRef = useRef(1);
 
-    const productosCopy = (box.productos || []).map((p) => ({ ...p }));
+  const markBoxReady = (box: Omit<ReadyBox, "id" | "readyAt">) => {
+    const productosCopy = box.productos.map((p) => ({ ...p }));
+
+    const id = nextIdRef.current;
+    nextIdRef.current += 1;
+
     setReadyBoxes((prev) => [
       ...prev,
-      { id: nextId, ...box, productos: productosCopy, readyAt: new Date() },
+      {
+        ...box,
+        id,
+        productos: productosCopy,
+        readyAt: new Date(),
+      },
     ]);
-    setNextId((n) => n + 1);
   };
 
   const shipSingleBox = () => {
-    const [first, ...rest] = readyBoxes;
-    if (!first) return;
+    setReadyBoxes((prev) => {
+      if (prev.length === 0) return prev;
 
-    setShippedBoxes((prev) => [
-      ...prev,
-      { ...first, shippedAt: new Date(), status: "shipped" as const },
-    ]);
-    setReadyBoxes(rest);
+      const [first, ...rest] = prev;
+
+      setShippedBoxes((shipped) => [
+        ...shipped,
+        {
+          ...first,
+          shippedAt: new Date(),
+          status: "shipped" as const,
+        },
+      ]);
+
+      return rest;
+    });
   };
 
   const shipAllBoxes = () => {
@@ -49,6 +65,7 @@ export function useBoxShipping() {
         status: "shipped" as const,
       })),
     ]);
+
     setReadyBoxes([]);
   };
 

@@ -1,3 +1,4 @@
+// Importamos componentes de MUI para el modal, botones, inputs, etc.
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -7,25 +8,27 @@ import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import type { Product } from "../../interfaces/Product";
+import { useEffect } from "react";
 
+// Definición de las props del componente
 interface Props {
-  isOpen: boolean;
-  product: Product | null;
-  quantity: number;
-  onQuantityChange: (quantity: number) => void;
-  onConfirm: () => void;
-  onCancel: () => void;
+  isOpen: boolean; // controla si el modal está abierto
+  product: Product | null; // producto seleccionado (puede ser null)
+  quantity: number; // cantidad actualmente seleccionada
+  onQuantityChange: (quantity: number) => void; // callback para actualizar la cantidad
+  onConfirm: () => void; // callback al confirmar
+  onCancel: () => void; // callback al cancelar
 }
 
+// Constantes de colores y estilos para consistencia
 const PRIMARY = "#152c48";
 const PRIMARY_CONTRAST = "#fff";
-//const SECONDARY = "#80ac22";
+// const SECONDARY = "#80ac22"; // comentado, no se usa
 const SECONDARY_CONTRAST = "#fff";
 const NEUTRAL = "#fefefe";
 const BACKGROUND = "#ffffff";
 
-import { useEffect } from "react";
-
+// Componente principal
 export default function DragQuantityModal({
   isOpen,
   product,
@@ -34,46 +37,49 @@ export default function DragQuantityModal({
   onConfirm,
   onCancel,
 }: Props) {
-  // Si no hay producto, no renderizar nada
-  if (!product) return null;
+  // Si no hay producto, no renderizamos nada
+useEffect(() => {
+  if (isOpen && product) {
+    onQuantityChange(product?.quantity ?? 0);
+  }
+}, [isOpen, product]);
 
-  // Cuando el modal se abre, setear la cantidad máxima permitida
-  useEffect(() => {
-    if (isOpen && product) {
-      onQuantityChange(product.quantity);
-    }
-    // Solo cuando se abre el modal o cambia el producto
-  }, [isOpen, product]);
+if (!product) return null;
 
+  // Maneja cambios directos en el input numérico
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 0;
+    const value = parseInt(e.target.value) || 0; // si es NaN, se pone 0
     onQuantityChange(value);
   };
 
+  // Función para disminuir cantidad (por defecto 1)
   const decreaseQuantity = (amount: number = 1) => {
-    const newQty = Math.max(1, quantity - amount);
+    const newQty = Math.max(1, quantity - amount); // nunca bajar de 1
     onQuantityChange(newQty);
   };
 
+  // Función para aumentar cantidad (por defecto 1)
   const increaseQuantity = (amount: number = 1) => {
-    const newQty = Math.min(product.quantity, quantity + amount);
+    const newQty = Math.min(product.quantity, quantity + amount); // no superar stock
     onQuantityChange(newQty);
   };
 
   return (
+    // Modal principal
     <Dialog
-      open={isOpen}
-      onClose={onCancel}
+      open={isOpen} // abierto o cerrado
+      onClose={onCancel} // cerrar modal
       maxWidth="sm"
       fullWidth
       PaperProps={{
         sx: {
-          borderRadius: "8px",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
-          backgroundColor: BACKGROUND,
+          borderRadius: "8px", // bordes redondeados
+          boxShadow: "0 4px 20px rgba(0,0,0,0.1)", // sombra
+          backgroundColor: BACKGROUND, // color de fondo
         },
       }}
     >
+      {/* Título del modal */}
       <DialogTitle
         sx={{
           fontWeight: 700,
@@ -86,9 +92,11 @@ export default function DragQuantityModal({
         Seleccionar Cantidad de Items
       </DialogTitle>
 
+      {/* Contenido principal */}
       <DialogContent sx={{ pt: 3, pb: 3, backgroundColor: BACKGROUND }}>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-          {/* Info del producto */}
+          
+          {/* Información del producto */}
           <Box sx={{ textAlign: "center" }}>
             <p
               style={{
@@ -98,7 +106,7 @@ export default function DragQuantityModal({
                 fontWeight: 600,
               }}
             >
-              {product.description}
+              {product.description} {/* Descripción del producto */}
             </p>
             
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2 }}>
@@ -107,27 +115,21 @@ export default function DragQuantityModal({
                   Disponibles
                 </p>
                 <p style={{ margin: 0, color: PRIMARY, fontSize: 16, fontWeight: 700 }}>
-                  {product.quantity}
+                  {product.quantity} {/* Stock disponible */}
                 </p>
               </Box>
-              
-
             </Box>
           </Box>
 
-          <Divider sx={{ borderColor: "#e5e7eb" }} />
+          <Divider sx={{ borderColor: "#e5e7eb" }} /> {/* Línea divisoria */}
 
-          {/* Controles principales: - 10, - 5, input, + 5, + 10 */}
+          {/* Controles de cantidad */}
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {/* Fila de botones rápidos */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                gap: 1,
-                flexWrap: "wrap",
-              }}
-            >
+            
+            {/* Botones de ajuste rápido: -10, -5, +5, +10 */}
+            <Box sx={{ display: "flex", justifyContent: "center", gap: 1, flexWrap: "wrap" }}>
+              
+              {/* Disminuir 10 */}
               <Button
                 variant="outlined"
                 size="small"
@@ -145,6 +147,8 @@ export default function DragQuantityModal({
               >
                 − 10
               </Button>
+
+              {/* Disminuir 5 */}
               <Button
                 variant="outlined"
                 size="small"
@@ -163,6 +167,7 @@ export default function DragQuantityModal({
                 − 5
               </Button>
 
+              {/* Input numérico */}
               <TextField
                 type="number"
                 value={quantity}
@@ -193,6 +198,7 @@ export default function DragQuantityModal({
                 }}
               />
 
+              {/* Aumentar 5 */}
               <Button
                 variant="outlined"
                 size="small"
@@ -210,6 +216,8 @@ export default function DragQuantityModal({
               >
                 + 5
               </Button>
+
+              {/* Aumentar 10 */}
               <Button
                 variant="outlined"
                 size="small"
@@ -229,8 +237,9 @@ export default function DragQuantityModal({
               </Button>
             </Box>
 
-            {/* Controles unitarios: - 1, + 1 */}
+            {/* Botones unitarios: -1 y +1 */}
             <Box sx={{ display: "flex", justifyContent: "center", gap: 1 }}>
+              {/* Disminuir 1 */}
               <Button
                 variant="contained"
                 size="small"
@@ -244,16 +253,13 @@ export default function DragQuantityModal({
                   borderRadius: "6px",
                   border: `2px solid ${PRIMARY}`,
                   "&:hover": { backgroundColor: "rgba(21, 44, 72, 0.1)" },
-                  "&:disabled": {
-                    backgroundColor: "#f0f0f0",
-                    color: "#999",
-                    borderColor: "#ccc",
-                  },
+                  "&:disabled": { backgroundColor: "#f0f0f0", color: "#999", borderColor: "#ccc" },
                 }}
               >
                 −
               </Button>
 
+              {/* Aumentar 1 */}
               <Button
                 variant="contained"
                 size="small"
@@ -267,11 +273,7 @@ export default function DragQuantityModal({
                   borderRadius: "6px",
                   border: `2px solid ${PRIMARY}`,
                   "&:hover": { backgroundColor: "rgba(21, 44, 72, 0.1)" },
-                  "&:disabled": {
-                    backgroundColor: "#f0f0f0",
-                    color: "#999",
-                    borderColor: "#ccc",
-                  },
+                  "&:disabled": { backgroundColor: "#f0f0f0", color: "#999", borderColor: "#ccc" },
                 }}
               >
                 +
@@ -281,6 +283,7 @@ export default function DragQuantityModal({
         </Box>
       </DialogContent>
 
+      {/* Botones finales del modal */}
       <DialogActions
         sx={{
           p: 2.5,
@@ -289,6 +292,7 @@ export default function DragQuantityModal({
           borderTop: `1px solid #e5e7eb`,
         }}
       >
+        {/* Cancelar */}
         <Button
           onClick={onCancel}
           variant="outlined"
@@ -303,6 +307,8 @@ export default function DragQuantityModal({
         >
           Cancelar
         </Button>
+
+        {/* Confirmar */}
         <Button
           onClick={onConfirm}
           variant="contained"
@@ -321,6 +327,3 @@ export default function DragQuantityModal({
     </Dialog>
   );
 }
-
-
-

@@ -1,80 +1,93 @@
+// src/Packing/components/UI/AssignItemsModal.tsx
+
 import { useState, useEffect } from "react";
-import Modal from "./Modal";
+import Modal from "./Modal"; // Componente base para mostrar modal
 import type { Product } from "../../interfaces/Product";
 
+// Props del componente
 interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  product: Product | null;
+  isOpen: boolean; // Estado del modal abierto/cerrado
+  onClose: () => void; // Función para cerrar el modal
+  product: Product | null; // Producto seleccionado para repartir
   onAssignToMultipleBoxes: (
-    amountPerBox: number,
-    numberOfBoxes: number
-  ) => void;
+    amountPerBox: number, // cantidad que irá en cada caja
+    numberOfBoxes: number // cantidad de cajas
+  ) => void; 
 }
 
+// Componente principal
 export default function AssignItemsModal({
   isOpen,
   onClose,
   product,
   onAssignToMultipleBoxes,
 }: Props) {
+  // Si no hay producto seleccionado, no renderizamos nada
   if (!product) return null;
 
+  // Estado para inputs: cantidad por caja y número de cajas
   const [amountPerBox, setAmountPerBox] = useState<number | "">("");
   const [numberOfBoxes, setNumberOfBoxes] = useState<number | "">("");
 
+  // Calcula el total que se distribuiría según los inputs
   const totalAvailable =
     typeof amountPerBox === "number" && typeof numberOfBoxes === "number"
       ? amountPerBox * numberOfBoxes
       : 0;
 
+  // Validación: no se puede superar la cantidad total, ni poner valores < 1
   const isInvalid =
     totalAvailable > product.quantity ||
     (amountPerBox !== "" && amountPerBox < 1) ||
     (numberOfBoxes !== "" && numberOfBoxes < 1);
 
-  // Reset cuando cambia de producto
+  // Resetear inputs cada vez que cambie el producto
   useEffect(() => {
     setAmountPerBox("");
     setNumberOfBoxes("");
   }, [product]);
 
-  // Validaciones: no negativos, no cero, inputs libres
+  // === Funciones para manejar cambios en inputs ===
+  
   const handleAmountChange = (value: string) => {
     const num = Number(value);
-    if (value === "") return setAmountPerBox("");
-    if (isNaN(num) || num < 1) return setAmountPerBox(1);
+    if (value === "") return setAmountPerBox(""); // input vacío
+    if (isNaN(num) || num < 1) return setAmountPerBox(1); // no negativos ni cero
     setAmountPerBox(num);
   };
 
   const handleNumberChange = (value: string) => {
     const num = Number(value);
-    if (value === "") return setNumberOfBoxes("");
-    if (isNaN(num) || num < 1) return setNumberOfBoxes(1);
+    if (value === "") return setNumberOfBoxes(""); // input vacío
+    if (isNaN(num) || num < 1) return setNumberOfBoxes(1); // no negativos ni cero
     setNumberOfBoxes(num);
   };
 
+  // Confirmar asignación
   const handleAssign = () => {
-    if (amountPerBox === "" || numberOfBoxes === "") return;
-    onAssignToMultipleBoxes(amountPerBox as number, numberOfBoxes as number);
-    onClose();
+    if (amountPerBox === "" || numberOfBoxes === "") return; // validar que haya valores
+    onAssignToMultipleBoxes(amountPerBox as number, numberOfBoxes as number); // llamamos al padre
+    onClose(); // cerramos modal
   };
 
+  // === Render del modal ===
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-<h2 className="text-sm font-semibold mb-3 text-center text-gray-800">
-  Repartir unidades de:<br />
-  <span className="text-[#152c48]  text-base">
-    {product.description}
-  </span>
-</h2>
+      {/* Título */}
+      <h2 className="text-sm font-semibold mb-3 text-center text-gray-800">
+        Repartir unidades de:<br />
+        <span className="text-[#152c48]  text-base">
+          {product.description}
+        </span>
+      </h2>
 
+      {/* Información de unidades disponibles */}
       <p className="text-center mb-4 text-gray-700">
         Unidades disponibles: <strong>{product.quantity}</strong>
       </p>
 
       <div className="space-y-4">
-        {/* Cantidad por caja */}
+        {/* Input: cantidad por caja */}
         <label className="block text-gray-700 font-medium">
           Cantidad por caja
           <input
@@ -87,7 +100,7 @@ export default function AssignItemsModal({
           />
         </label>
 
-        {/* Número de cajas */}
+        {/* Input: número de cajas */}
         <label className="block text-gray-700 font-medium">
           Número de cajas
           <input
@@ -100,14 +113,14 @@ export default function AssignItemsModal({
           />
         </label>
 
-        {/* Mensaje de error */}
+        {/* Mensaje de error si la distribución excede el stock */}
         {isInvalid && (
           <p className="text-red-600 text-sm text-center">
             La distribución excede las unidades disponibles.
           </p>
         )}
 
-        {/* Botón Asignar */}
+        {/* Botón de acción */}
         <button
           className={`w-full py-3 rounded-lg font-medium transition text-white shadow-md
             ${

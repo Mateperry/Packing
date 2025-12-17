@@ -1,11 +1,8 @@
-//Aquí manejamos lo que es la estrucura de proyecto para llamarla varias veces
-
-
+// Definimos la interfaz Product que representa la estructura de un producto
 export interface Product {
-  id: number;
-  name: string;
-  description: string;
-  quantity: number;
-  color?: string;
- 
+  id: number; // ID único del producto
+  name: string; // Nombre del producto
+  description: string; // Descripción del producto
+  quantity: number; // Cantidad disponible en inventario
+  color?: string; // Color del producto (opcional)
 }

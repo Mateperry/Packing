@@ -1,53 +1,59 @@
-Estructura Packing
 src/
 │
-├── App.tsx                        ← Punto de entrada principal, renderiza los componentes globales y carga PackingPage
+├── App.tsx YA
+│   ← Punto de entrada principal. Renderiza la pantalla de selección de órdenes (OrderListPage) y, tras seleccionar una, carga PackingPage con los productos de la orden seleccionada.
 │
-└── Packing/                       ← Carpeta principal del proceso de Packing
-	│
-	│
-	├── components/                ← Componentes reutilizables y específicos del packing
-	│   ├── Box/                       ← Componentes relacionados a la visualización y lógica de cajas
-	│   │   ├── BoxCard.tsx                ← Tarjeta visual de una caja
-	│   │   ├── BoxContend.tsx             ← Contenido interno de la caja
-	│   │   ├── BoxDroppableZone.tsx       ← Zona donde se pueden soltar productos en la caja
-	│   │   ├── Boxlist.tsx                ← Lista de cajas disponibles
-	│   │   └── DroppableBox.tsx           ← Caja que acepta productos arrastrados
-	│   ├── common/                    ← Componentes de uso general
-	│   │   ├── EyeToggleButton.tsx        ← Botón para mostrar/ocultar elementos
-	│   │   └── HomeButtons.tsx            ← Botones principales de navegación o acciones
-	│   ├── distribution/              ← Componentes para la lógica de distribución
-	│   │   └── RepartirPanel.tsx          ← Panel para repartir productos entre cajas
-	│   ├── Products/                  ← Componentes relacionados a productos
-	│   │   ├── DraggableProduct.tsx       ← Producto que se puede arrastrar
-	│   │   ├── PaginationButtons.tsx      ← Botones para paginación de productos
-	│   │   ├── ProductItem.tsx           ← Visualización individual de un producto
-	│   │   ├── ProductList.tsx           ← Lista de productos
-	│   │   └── SearchBar.tsx             ← Barra de búsqueda de productos
-	│   └── UI/                        ← Componentes de interfaz de usuario
-	│       ├── AssignItemsModal.tsx       ← Modal para asignar productos a cajas
-	│       ├── DragQuantityModal.tsx      ← Modal para elegir cantidad al arrastrar
-	│       ├── Modal.tsx                  ← Modal genérico reutilizable
-	│       └── ReadyBoxesPanel.tsx        ← Panel de cajas listas para envío
-	│
-	├── Hooks/                      ← Custom hooks para lógica reutilizable
-	│   ├── useBoxShipping.ts            ← Lógica para el envío de cajas
-	│   ├── usePackingManager.ts         ← Gestión y búsqueda de items/cajas/productos
-	│   ├── usePackingService.ts         ← Servicios relacionados al packing (puede conectar con backend)
-	│   ├── usePagination.ts             ← Lógica de paginación de productos/cajas
-	│   ├── useProducts.ts               ← Manejo del array de productos y lógica de cantidades
-	│   ├── useQuantityModal.ts          ← Lógica para el modal de cantidad
-	│   ├── useResponsiveItems.ts        ← Adaptación de items a diferentes tamaños de pantalla
-	│   ├── useSearchProducts.ts         ← Lógica de búsqueda de productos
-	│   └── useToggleVisibility.ts       ← Lógica para mostrar/ocultar elementos
-	│
-	├── interfaces/                 ← Definiciones TypeScript de estructuras de datos
-	│   └── Product.ts                  ← Definición de la estructura de un producto
-	│
-	├── pages/                      ← Páginas principales de la app
-	│   └── PackingPage.tsx             ← Página principal que integra todos los componentes del packing
-
-	// NOTA: Si necesitas servicios, tipos o utilidades, puedes agregarlos en las carpetas:
-	// services/   ← Para lógica de conexión con APIs o servicios externos
-	// types/      ← Para definir tipos e interfaces TypeScript adicionales
-	// utils/      ← Para funciones utilitarias y validaciones
+└── Packing/
+    │
+    ├── components/  YA              ← Componentes reutilizables y específicos del packing
+    │   ├── Box/ YA                   ← Componentes para visualización y lógica de cajas
+    │   │   ├── BoxCard.tsx            ← Tarjeta visual de una caja
+    │   │   ├── BoxContend.tsx         ← Contenido interno de la caja
+    │   │   ├── BoxDroppableZone.tsx   ← Zona donde se pueden soltar productos en la caja
+    │   │   ├── Boxlist.tsx            ← Lista de cajas disponibles (muestra las cajas, permite empacar y devolver productos)
+    │   │   └── DroppableBox.tsx       ← Caja que acepta productos arrastrados
+    │   ├── common/YA
+    │   │   ├── EyeToggleButton.tsx    ← Botón para mostrar/ocultar elementos
+    │   │   └── HomeButtons.tsx        ← Botones principales de navegación o acciones
+    │   ├── distribution/YA
+    │   │   └── RepartirPanel.tsx      ← Panel para repartir productos entre cajas
+    │   ├── Products/ YA 
+    │   │   ├── DraggableProduct.tsx   ← Producto que se puede arrastrar
+    │   │   ├── PaginationButtons.tsx  ← Botones para paginación de productos
+    │   │   ├── ProductItem.tsx        ← Visualización individual de un producto
+    │   │   ├── ProductList.tsx        ← Lista de productos (muestra solo los productos con cantidad > 0, actualiza al empacar/devolver)
+    │   │   └── SearchBar.tsx          ← Barra de búsqueda de productos
+    │   └── UI/YA
+    │       ├── AssignItemsModal.tsx   ← Modal para asignar productos a cajas
+    │       ├── DragQuantityModal.tsx  ← Modal para elegir cantidad al arrastrar
+    │       ├── Modal.tsx              ← Modal genérico reutilizable
+    │       └── ReadyBoxesPanel.tsx    ← Panel de cajas listas para envío
+    │
+    ├── Hooks/                        ← Custom hooks para lógica reutilizable y de negocio
+    │   ├── useBoxShipping.ts         ← Lógica para el envío de cajas
+    │   ├── usePackingManager.ts      ← Gestión y búsqueda de items/cajas/productos (estado de cajas y productos en cajas)
+    │   ├── usePackingService.ts      ← Orquestador: conecta ProductList, cajas y lógica de negocio (recibe productos de la orden, conecta decrease/increaseQuantity, etc.)
+    │   ├── usePagination.ts          ← Lógica de paginación de productos/cajas
+    │   ├── useProducts.ts            ← Manejo del array de productos y lógica de cantidades (soporta modo local para órdenes y modo global para inventario)
+    │   ├── useQuantityModal.ts       ← Lógica para el modal de cantidad
+    │   ├── useResponsiveItems.ts     ← Adaptación de items a diferentes tamaños de pantalla
+    │   ├── useSearchProducts.ts      ← Lógica de búsqueda de productos
+    │   └── useToggleVisibility.ts    ← Lógica para mostrar/ocultar elementos
+    │
+    ├── interfaces/
+    │   └── Product.ts                ← Definición de la estructura de un producto (id, name, description, quantity, color?)
+    │
+    ├── pages/ YA 
+    │   ├── OrderListPage.tsx         ← Pantalla de selección de órdenes (muestra todas las órdenes, permite seleccionar una y ver sus productos)
+    │   └── PackingPage.tsx           ← Página principal de empaque (recibe productos de la orden, muestra ProductList y cajas, maneja todo el flujo de packing)
+    │
+    ├── api/YA
+    │   ├── orders.service.ts         ← Servicios para obtener órdenes y sus productos desde Supabase
+    │   ├── products.service.ts       ← Servicios para obtener productos globales (solo si usas inventario global)
+    │   └── supabaseClient.ts         ← Configuración del cliente Supabase
+    │
+    ├── types/ YA                       ← Tipos TypeScript adicionales (ej: Order)
+    │   └── order.ts                  ← Definición de la estructura de una orden (id, status, products, created_at, etc.)
+    │
+    // utils/      ← Para funciones utilitarias y validaciones (si las necesitas)
+    // services/   ← Para lógica de conexión con APIs o servicios externos (si necesitas separar más)

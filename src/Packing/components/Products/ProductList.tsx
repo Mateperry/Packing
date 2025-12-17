@@ -1,56 +1,70 @@
-// src/Packing/components/Products/ProductList.tsx
+// Importamos hook de estado de React
 import { useState } from "react";
+
+// Tipos
 import type { Product } from "../../interfaces/Product";
 
-import SearchBar from "../Products/SearchBar";
-import DraggableProduct from "../Products/DraggableProduct";
-import PaginationButtons from "../Products/PaginationButtons";
-import AssignItemsModal from "../UI/AssignItemsModal";
+// Componentes internos
+import SearchBar from "../Products/SearchBar";           // Barra de búsqueda
+import DraggableProduct from "../Products/DraggableProduct"; // Producto que se puede arrastrar
+import PaginationButtons from "../Products/PaginationButtons"; // Botones de paginación
+import AssignItemsModal from "../UI/AssignItemsModal";  // Modal para asignar producto a varias cajas
 
-import { useSearchProducts } from "../../Hooks/useSearchProducts";
-import { usePagination } from "../../Hooks/usePagination";
-import { useResponsiveItems } from "../../Hooks/useResponsiveItems";
-import { useToggleVisibility } from "../../Hooks/useToggleVisibility";
+// Hooks personalizados
+import { useSearchProducts } from "../../Hooks/Products/useSearchProducts"; // Lógica de búsqueda
+import { usePagination } from "../../Hooks/Pagination/usePagination";         // Lógica de paginación
+import { useResponsiveItems } from "../../Hooks/UI/useResponsiveItems"; // Items por página según pantalla
+import { useToggleVisibility } from "../../Hooks/UI/useToggleVisibility"; // Mostrar/ocultar descripciones
 
+// Botón para mostrar/ocultar información
 import EyeToggleButton from "../common/EyeToggleButton";
 
+// Props del componente
 interface ProductListProps {
-  products: Product[];
-  usedProductIds?: number[];
-  decreaseQuantity: (id: number, amount: number) => void;
+  products: Product[]; // Productos a mostrar
+  usedProductIds?: number[]; // IDs de productos ya usados
+  decreaseQuantity: (id: number, amount: number) => void; // Reducir cantidad
   assignToMultipleBoxes?: (
     product: Product | number,
     amountPerBox: number,
     numberOfBoxes: number
-  ) => void;
+  ) => void; // Asignar a varias cajas
 }
 
+// Componente principal ProductList
 function ProductList({
   products,
   usedProductIds = [],
   decreaseQuantity,
   assignToMultipleBoxes,
 }: ProductListProps) {
+
+  // Filtramos productos disponibles (cantidad > 0 y no usados)
   const availableProducts = products.filter(
     (p) => p.quantity > 0 && !usedProductIds.includes(p.id)
   );
 
+  // Hook para búsqueda de productos
   const { search, onChange, filtered } = useSearchProducts(availableProducts);
+
+  // Determinamos cantidad de items por página según tamaño de pantalla
   const itemsPerPage = useResponsiveItems();
 
+  // Hook para paginación de productos
   const { page, totalPages, currentItems, nextPage, prevPage, resetPage } =
     usePagination(filtered, itemsPerPage);
 
-const { visible: showDescription, toggle } = useToggleVisibility(true);
+  // Hook para mostrar/ocultar descripción de productos
+  const { visible: showDescription, toggle } = useToggleVisibility(true);
 
-
+  // Manejar cambio de búsqueda
   function handleSearch(e: React.ChangeEvent<HTMLInputElement>) {
-    onChange(e);
-    resetPage();
+    onChange(e);     // Actualiza búsqueda
+    resetPage();     // Reinicia paginación a la primera página
   }
 
   // ---------------------------
-  //  MODAL
+  //  MODAL DE ASIGNACIÓN A VARIAS CAJAS
   // ---------------------------
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,12 +81,13 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
   // ---------------------------
 
   return (
-    <div className="w-full sm:w-2/12 md:w-3/12 lg:w-1/4 xl:w-[19%] bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-full">
+    <div className="w-full sm:w-2/12 md:w-3/12 lg:w-1/6 xl:w-1/6 bg-gray-50 rounded-xl p-4 flex flex-col gap-3 shadow-inner max-h-full">
+
       {/* Barra de búsqueda */}
       <SearchBar value={search} onChange={handleSearch} />
 
-      {/* Cantidad de ítems */}
-      <div className="bg-gray-200 rounded-xl  py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto relative">
+      {/* Contador de SKU */}
+      <div className="bg-gray-200 rounded-xl py-2 flex flex-col items-center justify-center text-gray-700 shadow-sm w-full sm:w-auto relative">
         <div className="absolute top-1 right-1 bg-transparent">
           <EyeToggleButton active={showDescription} onToggle={toggle} size={15} />
         </div>
@@ -82,18 +97,19 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
         </span>
       </div>
 
-      {/* Lista filtrada + paginada */}
-      <div className="flex flex-col gap-2  ">
+      {/* Lista filtrada y paginada de productos */}
+      <div className="flex flex-col gap-2">
         {currentItems.map((p) => (
           <DraggableProduct
             key={p.id}
             product={p}
-            showDescription={showDescription}
-            onOpenAssign={() => openAssignModal(p)}
+            showDescription={showDescription}      // Mostrar/ocultar descripción
+            onOpenAssign={() => openAssignModal(p)} // Abrir modal de asignación
           />
         ))}
       </div>
 
+      {/* Botones de paginación si hay más items que itemsPerPage */}
       {filtered.length > itemsPerPage && (
         <PaginationButtons
           page={page}
@@ -104,7 +120,7 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
       )}
 
       {/* ---------------------------
-           MODAL FINAL
+           MODAL FINAL: ASIGNAR A VARIAS CAJAS
          --------------------------- */}
       <AssignItemsModal
         isOpen={isModalOpen}
@@ -113,19 +129,21 @@ const { visible: showDescription, toggle } = useToggleVisibility(true);
         onAssignToMultipleBoxes={(amountPerBox: number, numberOfBoxes: number) => {
           if (!selectedProduct) return;
 
+          // Si existe función externa, la usamos
           if (assignToMultipleBoxes) {
             assignToMultipleBoxes(selectedProduct, amountPerBox, numberOfBoxes);
           } else {
+            // Si no, reducimos cantidad directamente
             const total = amountPerBox * numberOfBoxes;
             decreaseQuantity(selectedProduct.id, total);
           }
 
-          closeModal();
+          closeModal(); // Cerramos modal al final
         }}
       />
     </div>
   );
 }
 
+// Exportamos componente
 export default ProductList;
-
