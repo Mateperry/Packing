@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Product } from "../interfaces/Product";
+import type { Product } from "../../interfaces/Product";
 
 export function useQuantityModal() {
   const [isOpen, setIsOpen] = useState(false);

@@ -141,7 +141,7 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
       {/* Modal de cantidad para drag & drop */}
       <DragQuantityModal
         isOpen={isQuantityModalOpen}
-        product={quantityModalProduct ?? undefined} // nunca null para evitar romper hooks
+        product={quantityModalProduct ?? null} // nunca null para evitar romper hooks
         quantity={quantityModalQuantity}
         onQuantityChange={updateQuantityModalQuantity}
         onConfirm={() => {

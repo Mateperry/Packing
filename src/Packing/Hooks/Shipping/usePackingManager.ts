@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Product } from "../interfaces/Product";
+import type { Product } from "../../interfaces/Product";
 
 export function usePackingManager(initial = 1) {
   /* =========================
