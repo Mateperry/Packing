@@ -1,11 +1,9 @@
 // src/Packing/pages/PackingPage.tsx
-
 import { useState } from "react";
 import {
   DndContext,
-  PointerSensor,
-  TouchSensor,
   MouseSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
@@ -31,7 +29,9 @@ interface PackingPageProps {
 }
 
 function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
-  // ⚡ Hooks principales
+  // =============================
+  // HOOK PRINCIPAL DE PACKING
+  // =============================
   const {
     products,
     boxes,
@@ -54,20 +54,27 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
     restoreProductsToIndex,
   } = usePackingService(orderProducts);
 
+  // =============================
+  // CAJAS LISTAS
+  // =============================
   const { readyBoxes, markBoxReady, unmarkBoxReady } = useBoxShipping();
-  const [isReadyBoxesOpen, setIsReadyBoxesOpen] = useState(false);
+  const [isReadyBoxesOpen, setIsReadyBoxesOpen] = useState(true);
 
-  // Marcar caja lista
+  // Marcar caja como lista y abrir panel
   const handleMarkBoxReady = (boxId: number, productos: Product[]) => {
     markBoxReady({
       titulo: `Caja ${boxId + 1}`,
       productos,
       sourceIndex: boxId,
     });
+
     resetBox(boxId);
+
+    // Abrir panel para mostrar la caja recién marcada
+    setIsReadyBoxesOpen(true);
   };
 
-  // Restaurar caja lista
+  // Restaurar caja desde el panel de listas
   const handleRestoreReady = (readyBoxId: number) => {
     const box = readyBoxes.find((b) => b.id === readyBoxId);
     if (!box) return;
@@ -75,22 +82,34 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
     const sourceIndex =
       typeof box.sourceIndex === "number" ? box.sourceIndex : undefined;
 
-    if (typeof sourceIndex === "number" && boxes[sourceIndex]?.productos.length === 0) {
-      restoreProductsToIndex(sourceIndex, box.productos.map((p) => ({ ...p })));
+    // Restaurar productos a la caja original si sourceIndex existe
+    if (typeof sourceIndex === "number") {
+      restoreProductsToIndex(
+        sourceIndex,
+        box.productos.map((p) => ({ ...p }))
+      );
     } else {
-      restoreProductsToFirstEmptyBox(box.productos.map((p) => ({ ...p })));
+      // Si no hay índice, restaurar a la primera caja vacía
+      restoreProductsToFirstEmptyBox(
+        box.productos.map((p) => ({ ...p }))
+      );
     }
 
+    // Quitar la caja del panel de listas
     unmarkBoxReady(readyBoxId);
   };
 
-  // Sensores para drag & drop
+  // =============================
+  // CONFIGURACIÓN DND-KIT
+  // =============================
   const sensors = useSensors(
-    useSensor(MouseSensor),
-    useSensor(TouchSensor, { activationConstraint: { delay: 5, tolerance: 0 } }),
-    useSensor(PointerSensor)
+    useSensor(MouseSensor, { activationConstraint: { distance: 10 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } })
   );
 
+  // =============================
+  // RENDER
+  // =============================
   return (
     <div className="p-3 bg-white rounded-xl shadow-lg max-w-full mx-auto mb-5 my-scroll">
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
@@ -102,16 +121,16 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
           <HomeButtons onCancel={onCancel} />
         </div>
 
-        {/* CONTENIDO */}
+        {/* CONTENIDO PRINCIPAL */}
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Lista de productos */}
+          {/* LISTA DE PRODUCTOS */}
           <ProductList
             products={products}
             assignToMultipleBoxes={assignToMultipleBoxes}
             decreaseQuantity={decreaseQuantity}
           />
 
-          {/* Contenedor de cajas */}
+          {/* LISTA DE CAJAS */}
           <div className="flex-1 bg-gray-50 rounded-xl p-2 shadow-inner">
             <BoxList
               boxes={boxes}
@@ -120,7 +139,9 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
               decrementOne={decrementOne}
               removeProduct={handleRemoveProduct}
               onMarkBoxReady={handleMarkBoxReady}
-              readyBoxIds={readyBoxes.map((b) => b.id)}
+              readyBoxIds={readyBoxes
+                .map((b) => b.sourceIndex)
+                .filter((v): v is number => typeof v === "number")}
               productsCount={products.reduce((sum, p) => sum + (p.quantity || 0), 0)}
               isReadyBoxesOpen={isReadyBoxesOpen}
               onToggleReadyBoxes={() => setIsReadyBoxesOpen((s) => !s)}
@@ -130,7 +151,7 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
         </div>
       </DndContext>
 
-      {/* Panel de cajas listas */}
+      {/* PANEL DE CAJAS LISTAS */}
       <ReadyBoxesPanel
         readyBoxes={readyBoxes}
         onRestore={handleRestoreReady}
@@ -138,19 +159,15 @@ function PackingPage({ orderProducts, onCancel }: PackingPageProps) {
         onClose={() => setIsReadyBoxesOpen(false)}
       />
 
-      {/* Modal de cantidad para drag & drop */}
+      {/* MODAL DE CANTIDAD */}
       <DragQuantityModal
         isOpen={isQuantityModalOpen}
-        product={quantityModalProduct ?? null} // nunca null para evitar romper hooks
+        product={quantityModalProduct ?? null}
         quantity={quantityModalQuantity}
         onQuantityChange={updateQuantityModalQuantity}
         onConfirm={() => {
           if (quantityModalProduct && quantityModalBoxId !== null) {
-            handleConfirmDragQuantity(
-              quantityModalProduct,
-              quantityModalBoxId,
-              quantityModalQuantity
-            );
+            handleConfirmDragQuantity(quantityModalProduct, quantityModalBoxId, quantityModalQuantity);
           }
         }}
         onCancel={closeQuantityModal}

@@ -1,83 +1,68 @@
-// Importamos iconos de Material UI
-import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined"; // Icono de bolsa
-import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined"; // Icono de inventario
-
-// Tipos
+import LocalMallOutlinedIcon from "@mui/icons-material/LocalMallOutlined";
+import Inventory2OutlinedIcon from "@mui/icons-material/Inventory2Outlined";
 import type { Product } from "../../interfaces/Product";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-// Props del componente
 interface Props {
-  product: Product;              // Producto a mostrar
-  showDescription: boolean;      // Si true, mostrar descripción truncada
-  onOpenAssign?: () => void;     // Función para abrir modal de asignación
-  descriptionTruncated?: string; // Descripción truncada pasada desde DraggableProduct
+  product: Product;
+  showDescription: boolean;
+  onOpenAssign?: () => void;
+  descriptionTruncated?: string;
 }
 
-// Componente principal
-function ProductItem({ product, showDescription, onOpenAssign, descriptionTruncated }: Props) {
-  // Estado del color del producto
+function ProductItem({
+  product,
+  showDescription,
+  onOpenAssign,
+  descriptionTruncated,
+}: Props) {
   const [color, setColor] = useState(product.color || "#152c48");
 
-  // Efecto para cambiar color según cantidad
   useEffect(() => {
     if (product.quantity >= 100 && product.color !== "#5cc4ed") {
-      product.color = "#5cc4ed"; // Cambia color del producto
-      setColor("#5cc4ed");       // Actualiza el estado
+      product.color = "#5cc4ed";
+      setColor("#5cc4ed");
     }
   }, [product.quantity]);
 
   return (
-    <div className="relative bg-white rounded-xl shadow-md p-1 flex flex-col items-center justify-center gap-1 border cursor-grab active:cursor-grabbing">
-      
-      {/* Cantidad del producto */}
-      <div className="text-lg font-bold">{product.quantity}</div>
+    <div className="relative bg-white rounded-xl shadow-md p-2 flex flex-col items-center gap-1 border">
 
-      {/* Icono principal con color */}
-      <div
-        className="
-          w-10 h-10 rounded-xl flex items-center justify-center text-xl 
-          transition-all duration-200
-          hover:shadow-lg hover:scale-105
-        "
-        style={{
-          backgroundColor: `${color}15`, // fondo muy sutil
-        }}
-      >
-        <LocalMallOutlinedIcon
-          sx={{
-            color,              // color del icono
-            transition: "0.2s",
-            "&:hover": { filter: "brightness(1.2)" }, // efecto hover
-          }}
-        />
+      <div className="flex flex-col items-center gap-1 w-full">
+        <div className="text-lg font-bold">{product.quantity}</div>
+
+        <div
+          className="w-10 h-10 rounded-xl flex items-center justify-center"
+          style={{ backgroundColor: `${color}15` }}
+        >
+          <LocalMallOutlinedIcon sx={{ color }} />
+        </div>
+
+        <div className="text-gray-700 text-center text-xs">
+          {showDescription
+            ? descriptionTruncated || product.description || product.name
+            : product.name}
+        </div>
       </div>
 
-      {/* Texto principal */}
-      <div className="text-gray-700 text-center">
-        {showDescription
-          ? (descriptionTruncated || product.description || product.name) // mostrar descripción truncada
-          : product.name} 
-      </div>
-
-      {/* Botón de asignar a múltiples cajas (visible si cantidad > 5) */}
       {product.quantity > 5 && (
         <button
-          className="absolute top-3 right-3 p-1 active:scale-95 transition no-drag"
-          onPointerDown={(e) => { e.stopPropagation(); e.preventDefault(); }} // evita iniciar drag
+          className="no-drag absolute top-2 right-2 p-1"
+          onPointerDown={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+          }}
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            onOpenAssign?.(); // abre modal de asignación
+            onOpenAssign?.();
           }}
         >
-          <Inventory2OutlinedIcon /> {/* Icono de inventario */}
+          <Inventory2OutlinedIcon />
         </button>
       )}
-
     </div>
   );
 }
 
-// Exportamos componente
 export default ProductItem;

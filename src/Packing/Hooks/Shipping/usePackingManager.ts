@@ -3,7 +3,7 @@ import type { Product } from "../../interfaces/Product";
 
 export function usePackingManager(initial = 1) {
   /* =========================
-     STATE (fuente de verdad)
+     STATE (FUENTE DE VERDAD)
   ========================= */
 
   const [productosPorCaja, setProductosPorCaja] = useState<
@@ -17,16 +17,14 @@ export function usePackingManager(initial = 1) {
   const cantidadDeCajas = productosPorCaja.length;
 
   /* =========================
-     CAJAS (EXPLÍCITAS)
+     CAJAS (MANUALES)
   ========================= */
 
-  // ➕ SOLO por acción del usuario
   const aumentarCajas = () => {
     setProductosPorCaja((prev) => [...prev, []]);
     setMostrarTitulos((prev) => [...prev, true]);
   };
 
-  // ❌ Nunca dejar 0 cajas
   const eliminarCaja = (index: number) => {
     setProductosPorCaja((prev) => {
       if (prev.length === 1) return prev;
@@ -38,6 +36,7 @@ export function usePackingManager(initial = 1) {
       return prev.filter((_, i) => i !== index);
     });
   };
+
   const resetBox = (index: number) => {
     setProductosPorCaja((prev) => {
       const copy = [...prev];
@@ -46,10 +45,8 @@ export function usePackingManager(initial = 1) {
     });
   };
 
-
   /* =========================
-     REPARTIR / RESTORE
-     ❗ NO CREA CAJAS
+     RESTORE (NO CREA CAJAS)
   ========================= */
 
   const restoreProductsToFirstEmptyBox = (
@@ -58,8 +55,7 @@ export function usePackingManager(initial = 1) {
     setProductosPorCaja((prev) => {
       const copy = [...prev];
       const idx = copy.findIndex((p) => p.length === 0);
-
-      if (idx === -1) return prev; // ⛔ NO crear caja
+      if (idx === -1) return prev;
 
       copy[idx] = products.map((p) => ({ ...p }));
       return copy;
@@ -73,7 +69,7 @@ export function usePackingManager(initial = 1) {
     if (index < 0) return;
 
     setProductosPorCaja((prev) => {
-      if (!prev[index]) return prev; // ⛔ NO crear caja
+      if (!prev[index]) return prev;
       const copy = [...prev];
       copy[index] = products.map((p) => ({ ...p }));
       return copy;
@@ -146,7 +142,7 @@ export function usePackingManager(initial = 1) {
   };
 
   /* =========================
-     REPARTIR (ÚNICA AUTO-CREACIÓN)
+     CREAR CAJAS (ÚNICO LUGAR)
   ========================= */
 
   const createEmptyBoxes = (n: number): number[] => {
@@ -181,8 +177,8 @@ export function usePackingManager(initial = 1) {
 
     aumentarCajas,
     eliminarCaja,
-    
- resetBox,
+    resetBox,
+
     restoreProductsToFirstEmptyBox,
     restoreProductsToIndex,
 
@@ -191,7 +187,6 @@ export function usePackingManager(initial = 1) {
     removeProduct,
 
     createEmptyBoxes,
-
     boxes,
   };
 }
