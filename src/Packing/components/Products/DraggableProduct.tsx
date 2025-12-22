@@ -27,9 +27,14 @@ export default function DraggableProduct({
     disabled,
   });
 
-  const style = transform
-    ? { transform: `translate(${transform.x}px, ${transform.y}px)` }
-    : undefined;
+  const style = {
+    transform: transform
+      ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
+      : undefined,
+    zIndex: isDragging ? 9999 : 1,          // 🔥 CLAVE
+    opacity: disabled ? 0.4 : isDragging ? 0.8 : 1,
+    cursor: disabled ? "not-allowed" : "grab",
+  };
 
   const truncatedDescription =
     product.description && product.description.length > 20
@@ -41,11 +46,7 @@ export default function DraggableProduct({
       ref={setNodeRef}
       {...attributes}
       {...listeners}
-      style={{
-        ...style,
-        opacity: disabled ? 0.4 : isDragging ? 0.6 : 1,
-        cursor: disabled ? "not-allowed" : "grab",
-      }}
+      style={style}
       className="
         relative
         select-none

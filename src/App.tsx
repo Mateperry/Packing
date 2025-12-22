@@ -1,61 +1,120 @@
-// Importamos la página principal de empaque
-import PackingPage from './Packing/pages/PackingPage';
+import { useState } from "react";
+import "./index.css";
 
-// Importamos hooks de React para manejar estado y efectos secundarios
-import { useState } from 'react';
+import OrderListPage from "./Packing/pages/OrderListPage";
+import PackingPage from "./Packing/pages/PackingPage";
+import LabelsPage from "./Packing/pages/LabelsPage";
 
-// Importamos los estilos globales de la aplicación
-import './index.css';
+import type { Product } from "./Packing/interfaces/Product";
+import { useOrders } from "./Packing/Hooks/Orders/useOrders";
 
-// Importamos la página que lista todas las órdenes
-import OrderListPage from './Packing/pages/OrderListPage';
-
-// Importamos el tipo de producto para TypeScript
-import type { Product } from './Packing/interfaces/Product';
-
-// Importamos el hook personalizado para obtener las órdenes
-import { useOrders } from './Packing/Hooks/Orders/useOrders';
+type View = "orders" | "packing" | "labels";
 
 function App() {
-  // Estado que guarda el ID de la orden seleccionada
-  // Inicialmente es null (ninguna orden seleccionada)
+  /* ======================
+      ESTADOS PRINCIPALES
+  ====================== */
+  const [view, setView] = useState<View>("orders");
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
 
-  // Obtenemos la lista de órdenes desde el hook useOrders
+  //  PRODUCTOS DE LA ORDEN (SE CARGAN UNA SOLA VEZ)
+  const [orderProducts, setOrderProducts] = useState<Product[]>([]);
+
+  //  CAJAS LISTAS
+  const [readyBoxes, setReadyBoxes] = useState<any[]>([]);
+
   const { orders } = useOrders();
 
-  // Busca la orden seleccionada en la lista de órdenes
-  const selectedOrder = orders.find(o => String(o.id) === selectedOrderId);
+  /* ======================
+      FINALIZAR PROCESO
+  ====================== */
+  const handleFinalizeProcess = async () => {
+    if (!selectedOrderId || readyBoxes.length === 0) return;
 
-  // Prepara los productos de la orden seleccionada
-  const orderProducts: Product[] = selectedOrder && Array.isArray(selectedOrder.products)
-    ? selectedOrder.products.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        description: p.description || '', // Si no tiene descripción, se pone vacío
-        quantity: p.quantity || 1,       // Si no tiene cantidad, se pone 1 por defecto
-      }))
-    : []; // Si no hay orden seleccionada, devuelve array vacío
+    const payload = {
+      orderId: selectedOrderId,
+      cajas: readyBoxes,
+      finishedAt: new Date().toISOString(),
+    };
+
+    console.log(" Enviando a base de datos:", payload);
+
+    //  FUTURO (Supabase / API)
+    // await supabase.from("packed_orders").insert(payload);
+
+    //  LIMPIEZA TOTAL
+    setReadyBoxes([]);
+    setOrderProducts([]);
+    setSelectedOrderId(null);
+    setView("orders");
+  };
+
+  /* ======================
+     1️ LISTA DE ÓRDENES
+  ====================== */
+  if (view === "orders") {
+    return (
+      <OrderListPage
+        onSelect={(id) => {
+          const order = orders.find((o) => String(o.id) === id);
+
+          if (order && Array.isArray(order.products)) {
+            setOrderProducts(
+              order.products.map((p: any) => ({
+                id: p.id,
+                name: p.name,
+                description: p.description || "",
+                quantity: p.quantity || 1,
+              }))
+            );
+          }
+
+          setSelectedOrderId(id);
+          setView("packing");
+        }}
+      />
+    );
+  }
 
   return (
     <>
-      {
-        // Renderizado condicional:
-        // Si no hay orden seleccionada, mostramos la página de lista de órdenes
-        !selectedOrderId ? (
-          <OrderListPage onSelect={setSelectedOrderId} /> 
-        ) : (
-          // Si hay una orden seleccionada, mostramos la página de empaque
-          <PackingPage 
-            orderId={selectedOrderId}          
-            orderProducts={orderProducts}      
-            onCancel={() => setSelectedOrderId(null)} 
-          />
-        )
-      }
+      {/* ======================
+          2️ PACKING
+          (SE MANTIENE MONTADO)
+      ====================== */}
+      <div className={view === "labels" ? "hidden" : "block"}>
+        <PackingPage
+          orderId={selectedOrderId!}
+          orderProducts={orderProducts}
+          onCancel={() => {
+            //  cancelar = volver limpio
+            setView("orders");
+            setSelectedOrderId(null);
+            setReadyBoxes([]);
+            setOrderProducts([]);
+          }}
+          onFinishProcess={(boxes) => {
+            setReadyBoxes(boxes);
+            setView("labels");
+          }}
+        />
+      </div>
+
+      {/* ======================
+          3️ RÓTULOS
+      ====================== */}
+      {view === "labels" && (
+        <LabelsPage
+          readyBoxes={readyBoxes}
+          onExit={() => {
+            // 🔙 vuelve SIN resetear packing
+            setView("packing");
+          }}
+          onFinish={handleFinalizeProcess}
+        />
+      )}
     </>
   );
 }
 
-// Exportamos el componente principal para que pueda ser renderizado por React
 export default App;

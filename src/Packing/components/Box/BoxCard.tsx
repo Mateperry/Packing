@@ -195,6 +195,7 @@ export default function BoxCard({
                     justifyContent: "space-between",
                     alignItems: "center",
                     gap: 1,
+                    
                   }}
                   onMouseEnter={(e) => handleEnter(e, prod.description)}
                   onMouseLeave={handleLeave}

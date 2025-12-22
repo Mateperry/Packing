@@ -26,7 +26,7 @@ function ProductItem({
   }, [product.quantity]);
 
   return (
-    <div className="relative bg-white rounded-xl shadow-md p-2 flex flex-col items-center gap-1 border">
+    <div className="relative bg-white rounded-xl shadow-md p-2 flex flex-col items-center gap-1 border z-[999]">
 
       <div className="flex flex-col items-center gap-1 w-full">
         <div className="text-lg font-bold">{product.quantity}</div>

@@ -40,3 +40,6 @@
   background: #152c48;  /* verde un poco más oscuro */
 } 
 
+body {
+ overflow: auto;
+}
