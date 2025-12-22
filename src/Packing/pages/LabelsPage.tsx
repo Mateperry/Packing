@@ -47,7 +47,7 @@ export default function LabelsPage({
                        hover:bg-red-200 transition"
           >
             <CloseIcon fontSize="small" />
-            Volver a packing
+            Volver 
           </button>
 
           {/*  FINALIZADO */}

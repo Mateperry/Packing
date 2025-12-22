@@ -56,7 +56,7 @@ function PackingPage({
   const [isReadyBoxesOpen, setIsReadyBoxesOpen] = useState(true);
 
   /* =========================
-     ✅ CONDICIÓN FINALIZAR
+      CONDICIÓN FINALIZAR
   ========================= */
 const remainingProducts = products.reduce(
   (sum, p) => sum + (p.quantity || 0),
