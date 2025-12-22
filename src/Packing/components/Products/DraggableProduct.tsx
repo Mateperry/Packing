@@ -23,17 +23,21 @@ export default function DraggableProduct({
     isDragging,
   } = useDraggable({
     id: `product-${product.id}`,
-    data: { type: "PRODUCT", product },
+    data: {
+      type: "PRODUCT",
+      product,
+    },
     disabled,
   });
 
-  const style = {
+  const style: React.CSSProperties = {
     transform: transform
       ? `translate3d(${transform.x}px, ${transform.y}px, 0)`
       : undefined,
-    zIndex: isDragging ? 9999 : 1,          // 🔥 CLAVE
-    opacity: disabled ? 0.4 : isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 9999 : 1,
+    opacity: disabled ? 0.4 : isDragging ? 0.85 : 1,
     cursor: disabled ? "not-allowed" : "grab",
+    touchAction: "manipulation", // 🔥 clave para mobile
   };
 
   const truncatedDescription =
@@ -47,15 +51,14 @@ export default function DraggableProduct({
       {...attributes}
       {...listeners}
       style={style}
-      className="
-        relative
-        select-none
-        touch-none
-      "
+      className="relative select-none"
       onPointerDown={(e) => {
-        const isNoDrag = (e.target as HTMLElement).closest(".no-drag");
+        const target = e.target as HTMLElement;
+        const isNoDrag = target.closest(".no-drag");
+
         if (isNoDrag) {
-          e.stopPropagation();
+          e.preventDefault();
+          return;
         }
       }}
     >
